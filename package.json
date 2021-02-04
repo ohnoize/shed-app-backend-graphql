@@ -1,0 +1,26 @@
+{
+  "name": "shed-app-backend-graphql",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ohnoize/shed-app-backend-graphql.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ohnoize/shed-app-backend-graphql/issues"
+  },
+  "homepage": "https://github.com/ohnoize/shed-app-backend-graphql#readme",
+  "dependencies": {
+    "apollo-server": "^2.19.2",
+    "graphql": "^15.5.0",
+    "lodash": "^4.17.20",
+    "nodemon": "^2.0.7"
+  }
+}
