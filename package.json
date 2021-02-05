@@ -1,11 +1,14 @@
 {
   "name": "shed-app-backend-graphql",
+  "type": "module",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index.js"
+    "dev": "nodemon src/index.js",
+    "start": "node src/index.js",
+    "lint": "eslint ./src"
   },
   "repository": {
     "type": "git",
@@ -18,9 +21,19 @@
   },
   "homepage": "https://github.com/ohnoize/shed-app-backend-graphql#readme",
   "dependencies": {
+    "@babel/cli": "^7.12.13",
+    "@babel/core": "^7.12.13",
+    "@babel/node": "^7.12.13",
+    "@babel/preset-env": "^7.12.13",
     "apollo-server": "^2.19.2",
+    "babel-eslint": "^10.1.0",
     "graphql": "^15.5.0",
     "lodash": "^4.17.20",
     "nodemon": "^2.0.7"
+  },
+  "devDependencies": {
+    "eslint": "^7.19.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
   }
 }

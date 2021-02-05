@@ -1,10 +1,9 @@
-const { gql } = require('apollo-server');
-const subjects = require('../../../data/subjects')
-
+import { gql } from 'apollo-server';
+import subjects from '../../../data/subjects.js';
 
 const typeDefs = gql`
   type Subject {
-    id: Int
+    id: ID!
     name: String
     description: String
     timePracticed: Int
@@ -13,16 +12,16 @@ const typeDefs = gql`
     allSubjects: [Subject]
     subjectCount: Int
   }
-`
+`;
 
 const resolvers = {
   Query: {
     allSubjects: () => subjects,
     subjectCount: () => subjects.length
   }
-}
+};
 
-module.exports = {
+export default {
   typeDefs,
   resolvers
-}
+};

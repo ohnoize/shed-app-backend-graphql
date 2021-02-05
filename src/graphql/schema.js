@@ -1,9 +1,10 @@
-const { makeExecutableSchema, gql } = require('apollo-server');
-const { merge } = require('lodash');
+import { makeExecutableSchema, gql } from 'apollo-server';
+import pkg from 'lodash';
+import Session from './types/Session.js';
+import Subject from './types/Subject.js';
+import User from './types/User.js';
 
-const Session = require('./types/Session')
-const Subject  = require('./types/Subject')
-const User = require('./types/User')
+const { merge } = pkg;
 
 const rootTypeDefs = gql`
   type Query {
@@ -13,7 +14,7 @@ const rootTypeDefs = gql`
   type Mutation {
     root: String
   }
-`
+`;
 
 const typeDefs = [
   rootTypeDefs,
@@ -26,11 +27,11 @@ const resolvers = merge(
   Session.resolvers,
   Subject.resolvers,
   User.resolvers
-)
+);
 
-const schema = makeExecutableSchema({
-    typeDefs,
-    resolvers
-  });
+const createSchema = () => makeExecutableSchema({
+  typeDefs,
+  resolvers
+});
 
-module.exports = schema;
+export default createSchema;

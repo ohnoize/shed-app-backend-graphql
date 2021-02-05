@@ -1,24 +1,27 @@
-const { gql } = require('apollo-server');
-const users = require('../../../data/users')
+import { gql } from 'apollo-server';
+import users from '../../../data/users.js';
 
 const typeDefs = gql`
   type User {
-    id: Int
+    id: ID!
     username: String
+    instrument: String
   }
   extend type Query {
     allUsers: [User]
     userCount: Int
+    findUser(id: Int): User
   }
-`
+`;
 const resolvers = {
   Query: {
     allUsers: () => users,
-    userCount: () => users.length
+    userCount: () => users.length,
+    findUser: (root, args) => users.find(u => u.id === args.id)
   }
-}
+};
 
-module.exports = {
+export default {
   typeDefs,
   resolvers
-}
+};

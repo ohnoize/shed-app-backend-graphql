@@ -1,20 +1,24 @@
 const users = [
   {
     id: 1,
-    name: "olli",
+    username: 'olli',
+    instrument: 'guitar'
   },
   {
     id: 2,
-    name: "john",
+    username: 'john',
+    instrument: 'saxophone'
   },
   {
     id: 3,
-    name: "miles",
+    username: 'miles',
+    instrument: 'trumpet'
   },
   {
     id: 4,
-    name: "grant",
+    username: 'herbie',
+    instrument: 'piano'
   }
-]
+];
 
-module.exports = users;
+export default users;

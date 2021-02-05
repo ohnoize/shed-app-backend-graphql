@@ -1,11 +1,13 @@
-const { ApolloServer, gql } = require('apollo-server');
-const schema = require('./graphql/schema');
+import { ApolloServer } from 'apollo-server';
+import createSchema from './graphql/schema.js';
 
+const schema = createSchema();
 
 const server = new ApolloServer({
   schema
-})
+});
 
 server.listen().then(({ url }) => {
-  console.log(`Server ready at ${url}`)
-})
+  // eslint-disable-next-line no-console
+  console.log(`Server ready at ${url}`);
+});
