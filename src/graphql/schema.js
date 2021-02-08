@@ -3,6 +3,7 @@ import pkg from 'lodash';
 import Session from './types/Session.js';
 import Subject from './types/Subject.js';
 import User from './types/User.js';
+import addSession from './mutations/addSession.js';
 
 const { merge } = pkg;
 
@@ -20,13 +21,15 @@ const typeDefs = [
   rootTypeDefs,
   Session.typeDefs,
   Subject.typeDefs,
-  User.typeDefs
+  User.typeDefs,
+  addSession.typeDefs
 ];
 
 const resolvers = merge(
   Session.resolvers,
   Subject.resolvers,
-  User.resolvers
+  User.resolvers,
+  addSession.resolvers
 );
 
 const createSchema = () => makeExecutableSchema({

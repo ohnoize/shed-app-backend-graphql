@@ -1,19 +1,19 @@
 import { gql } from 'apollo-server';
 import sessions from '../../../data/sessions.js';
-import subjects from '../../../data/subjects.js';
-import users from '../../../data/users.js';
+// import subjects from '../../../data/subjects.js';
+// import users from '../../../data/users.js';
 
 const typeDefs = gql`
   type SessionSubject {
     id: ID!
-    length: Int
+    length: Int!
   }
   type Session {
     id: ID!
     totalLength: Int
     individualSubjects: [SessionSubject]
     notes: String
-    user: User
+    userID: ID!
   }
   extend type Query {
     allSessions: [Session]
@@ -24,21 +24,19 @@ const typeDefs = gql`
 
 const resolvers = {
   Session: {
-    individualSubjects: (root) => {
-      const subjectIDs = root.individualSubjects.map(s => s.id);
-      const subjectsArray = subjectIDs.map(s => subjects.filter(p => p.id === s));
-      // console.log(subjectsArray);
-      return {
-        id: subjectsArray.id,
-        name: subjectsArray.name,
-        description: subjectsArray.description
-      };
-    },
-    user: (root) => ({
-      id: root.user.id,
-      username: users.find(u => u.id === root.user.id).username,
-      instrument: users.find(u => u.id === root.user.id).instrument
-    })
+    // individualSubjects: (root) => {
+    //   const subjectIDs = root.individualSubjects.map(s => s.id);
+    //   // eslint-disable-next-line eqeqeq
+    //   const subjectsArray = subjectIDs.map(s => subjects.filter(p => p.id == s));
+    //   // console.log(subjectIDs);
+    //   console.log(subjectsArray);
+    //   return subjectsArray;
+    // },
+    // user: (root) => ({
+    //   id: root.user.id,
+    //   username: users.find(u => u.id === root.user.id).username,
+    //   instrument: users.find(u => u.id === root.user.id).instrument
+    // })
   },
   Query: {
     allSessions: () => sessions,
