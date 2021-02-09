@@ -14,13 +14,15 @@ const typeDefs = gql`
     allUsers: [User]
     userCount: Int
     findUser(id: Int): User
+    me: User
   }
 `;
 const resolvers = {
   Query: {
     allUsers: () => User.find({}),
     userCount: () => User.collection.countDocuments(),
-    findUser: (root, args) => User.findOne({ id: args.id })
+    findUser: (root, args) => User.findOne({ id: args.id }),
+    me: (root, args, context) => context.currentUser
   }
 };
 

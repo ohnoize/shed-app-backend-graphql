@@ -1,8 +1,7 @@
 import { gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import User from '../../models/user.js';
-
-const JWT_SECRET = 'SECRETKEYHERE';
+import config from '../../utils/config.cjs';
 
 const typeDefs = gql`
   
@@ -35,7 +34,7 @@ const resolvers = {
         id: user.id,
       };
 
-      return { value: jwt.sign(userForToken, JWT_SECRET) };
+      return { value: jwt.sign(userForToken, config.SECRET_KEY) };
     }
   }
 };

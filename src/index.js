@@ -1,14 +1,15 @@
 /* eslint-disable no-console */
 import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
+import jwt from 'jsonwebtoken';
 import createSchema from './graphql/schema.js';
+import User from './models/user.js';
 
-const MONGODB_URI = 'mongodb+srv://fullstack:fullstack1234@cluster0.soglv.mongodb.net/shed-app?retryWrites=true&w=majority';
-// const SECRET_KEY = 'SECRET KEY INDEED';
+import config from './utils/config.cjs';
 
-console.log('Connecting to', MONGODB_URI);
+console.log('Connectingg to', config.MONGODB_URI);
 
-mongoose.connect(MONGODB_URI, {
+mongoose.connect(config.MONGODB_URI, {
   useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true
 })
   .then(() => {
@@ -21,7 +22,18 @@ mongoose.connect(MONGODB_URI, {
 const schema = createSchema();
 
 const server = new ApolloServer({
-  schema
+  schema,
+  context: async ({ req }) => {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      const decodedToken = jwt.verify(
+        auth.substring(7), config.SECRET_KEY
+      );
+      const currentUser = await User.findById(decodedToken.id);
+      return { currentUser };
+    }
+    return null;
+  }
 });
 
 server.listen().then(({ url }) => {
