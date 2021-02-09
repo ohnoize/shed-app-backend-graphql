@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql, UserInputError } from 'apollo-server';
 import Session from '../../models/session.js';
 // import users from '../../../data/users.js';
 // import sessions from '../../../data/sessions.js';
@@ -27,9 +27,16 @@ const typeDefs = gql`
 
 const resolvers = {
   Mutation: {
-    addSession: (root, args) => {
+    addSession: async (root, args) => {
       const session = new Session({ ...args });
-      return session.save();
+      try {
+        await session.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args
+        });
+      }
+      return session;
     }
   }
 };

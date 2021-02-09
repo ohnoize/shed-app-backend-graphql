@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql, UserInputError } from 'apollo-server';
 import Subject from '../../models/subject.js';
 
 const typeDefs = gql`
@@ -10,10 +10,17 @@ const typeDefs = gql`
 
 const resolvers = {
   Mutation: {
-    addSubject: (root, args) => {
+    addSubject: async (root, args) => {
       const subject = new Subject({ ...args });
       subject.timePracticed = 0;
-      return subject.save();
+      try {
+        await subject.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args
+        });
+      }
+      return subject;
     }
   }
 };

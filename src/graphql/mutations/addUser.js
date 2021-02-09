@@ -1,4 +1,4 @@
-import { gql } from 'apollo-server';
+import { gql, UserInputError } from 'apollo-server';
 import User from '../../models/user.js';
 
 const typeDefs = gql`
@@ -10,9 +10,16 @@ const typeDefs = gql`
 
 const resolvers = {
   Mutation: {
-    addUser: (root, args) => {
+    addUser: async (root, args) => {
       const user = new User({ ...args });
-      return user.save();
+      try {
+        await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args
+        });
+      }
+      return user;
     }
   }
 };
