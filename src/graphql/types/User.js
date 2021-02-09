@@ -7,6 +7,9 @@ const typeDefs = gql`
     username: String!
     instrument: String
   }
+  type Token {
+    value: String!
+  }
   extend type Query {
     allUsers: [User]
     userCount: Int

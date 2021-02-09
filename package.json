@@ -29,6 +29,7 @@
     "babel-eslint": "^10.1.0",
     "dotenv": "^8.2.0",
     "graphql": "^15.5.0",
+    "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.20",
     "mongoose": "^5.11.15",
     "mongoose-unique-validator": "^2.0.3",
