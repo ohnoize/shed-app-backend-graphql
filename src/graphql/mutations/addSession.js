@@ -5,7 +5,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 const typeDefs = gql`
   input sessionSubjectInput {
-    id: ID
+    name: String
     length: Int
   } 
   
@@ -24,7 +24,6 @@ const resolvers = {
   Mutation: {
     addSession: (root, args) => {
       const session = { ...args.session, id: uuidv4() };
-      console.log(session);
       return session;
     }
   }

@@ -5,7 +5,7 @@ import sessions from '../../../data/sessions.js';
 
 const typeDefs = gql`
   type SessionSubject {
-    id: ID!
+    name: String!
     length: Int!
   }
   type Session {

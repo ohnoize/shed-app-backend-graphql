@@ -4,54 +4,48 @@ const sessions = [
     totalLength: 450,
     individualSubjects: [
       {
-        id: 1,
+        name: 'scales',
         length: 124
       },
       {
-        id: 2,
+        name: 'chords',
         length: 300
       }
     ],
     notes: 'good session',
-    user: {
-      id: 1
-    }
+    userID: 1
   },
   {
     id: 123224,
     totalLength: 230,
     individualSubjects: [
       {
-        id: 4,
+        name: 'repertoire',
         length: 235
       },
       {
-        id: 3,
+        name: 'scales',
         length: 30120
       }
     ],
     notes: 'nice practice',
-    user: {
-      id: 2
-    }
+    userID: 2
   },
   {
     id: 1245,
     totalLength: 12,
     individualSubjects: [
       {
-        id: 2,
+        name: 'chords',
         length: 42
       },
       {
-        id: 3,
+        name: 'arpeggios',
         length: 3020
       }
     ],
     notes: 'quite the sesh',
-    user: {
-      id: 4
-    }
+    userID: 4
   },
 ];
 
