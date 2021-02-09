@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server';
-import subjects from '../../../data/subjects.js';
+import Subject from '../../models/subject.js';
 
 const typeDefs = gql`
   type Subject {
@@ -16,8 +16,8 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    allSubjects: () => subjects,
-    subjectCount: () => subjects.length
+    allSubjects: () => Subject.find({}),
+    subjectCount: () => Subject.collection.countDocuments()
   }
 };
 

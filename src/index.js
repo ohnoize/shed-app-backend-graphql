@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
 import createSchema from './graphql/schema.js';

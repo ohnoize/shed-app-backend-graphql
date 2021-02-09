@@ -1,7 +1,5 @@
 import { gql } from 'apollo-server';
-import sessions from '../../../data/sessions.js';
-// import subjects from '../../../data/subjects.js';
-// import users from '../../../data/users.js';
+import Session from '../../models/session.js';
 
 const typeDefs = gql`
   type SessionSubject {
@@ -23,25 +21,11 @@ const typeDefs = gql`
 `;
 
 const resolvers = {
-  Session: {
-    // individualSubjects: (root) => {
-    //   const subjectIDs = root.individualSubjects.map(s => s.id);
-    //   // eslint-disable-next-line eqeqeq
-    //   const subjectsArray = subjectIDs.map(s => subjects.filter(p => p.id == s));
-    //   // console.log(subjectIDs);
-    //   console.log(subjectsArray);
-    //   return subjectsArray;
-    // },
-    // user: (root) => ({
-    //   id: root.user.id,
-    //   username: users.find(u => u.id === root.user.id).username,
-    //   instrument: users.find(u => u.id === root.user.id).instrument
-    // })
-  },
+
   Query: {
-    allSessions: () => sessions,
-    sessionCount: () => sessions.length,
-    findSession: (root, args) => sessions.find(s => s.id === args.id)
+    allSessions: () => Session.find({}),
+    sessionCount: () => Session.collection.countDocuments(),
+    findSession: (root, args) => Session.findOne({ id: args.id })
   }
 };
 

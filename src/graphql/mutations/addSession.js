@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server';
-import { v4 as uuidv4 } from 'uuid';
+import Session from '../../models/session.js';
 // import users from '../../../data/users.js';
 // import sessions from '../../../data/sessions.js';
 
@@ -16,15 +16,20 @@ const typeDefs = gql`
     userID: ID!
   }
   extend type Mutation {
-    addSession(session: createSessionInput): Session
+    addSession(
+      totalLength: Int!,
+      notes: String,
+      individualSubjects: [sessionSubjectInput],
+      userID: ID!
+    ): Session
   }
 `;
 
 const resolvers = {
   Mutation: {
     addSession: (root, args) => {
-      const session = { ...args.session, id: uuidv4() };
-      return session;
+      const session = new Session({ ...args });
+      return session.save();
     }
   }
 };

@@ -1,10 +1,10 @@
 import { gql } from 'apollo-server';
-import users from '../../../data/users.js';
+import User from '../../models/user.js';
 
 const typeDefs = gql`
   type User {
     id: ID!
-    username: String
+    username: String!
     instrument: String
   }
   extend type Query {
@@ -15,9 +15,9 @@ const typeDefs = gql`
 `;
 const resolvers = {
   Query: {
-    allUsers: () => users,
-    userCount: () => users.length,
-    findUser: (root, args) => users.find(u => u.id === args.id)
+    allUsers: () => User.find({}),
+    userCount: () => User.collection.countDocuments(),
+    findUser: (root, args) => User.findOne({ id: args.id })
   }
 };
 
