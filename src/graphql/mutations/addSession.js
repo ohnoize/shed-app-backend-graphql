@@ -31,14 +31,14 @@ const resolvers = {
   Mutation: {
     addSession: async (root, args) => {
       console.log(args.userID);
-      const user = await User.findOne({ id: args.userID });
+      const user = await User.findOne({ _id: args.userID });
       console.log(user);
       const session = new Session({ ...args, user: user.id });
+      console.log(session);
       try {
-        console.log(user);
-        // await session.save();
-        // user.sessions = user.sessions.concat(session.id);
-        // await user.save();
+        await session.save();
+        user.sessions = user.sessions.concat(session.id);
+        await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args

@@ -1,4 +1,5 @@
 import { gql } from 'apollo-server';
+import Session from '../../models/session.js';
 import User from '../../models/user.js';
 
 const typeDefs = gql`
@@ -20,6 +21,12 @@ const typeDefs = gql`
   }
 `;
 const resolvers = {
+  User: {
+    sessions: async (root) => {
+      const sessions = await Session.find({ user: root.id });
+      return sessions;
+    }
+  },
   Query: {
     allUsers: () => User.find({}),
     userCount: () => User.collection.countDocuments(),
