@@ -7,7 +7,7 @@ const typeDefs = gql`
   
   extend type Mutation {
     addUser(username: String!, instrument: String): User
-    login(username: String!, password: String!): Token
+    login(username: String!, password: String!): AuthPayload
   }
 `;
 
@@ -33,8 +33,9 @@ const resolvers = {
         username: user.username,
         id: user.id,
       };
+      const token = jwt.sign(userForToken, config.SECRET_KEY);
 
-      return { value: jwt.sign(userForToken, config.SECRET_KEY) };
+      return { token, user };
     }
   }
 };

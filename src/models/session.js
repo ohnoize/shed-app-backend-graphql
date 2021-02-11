@@ -6,13 +6,21 @@ const sessionSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  date: {
+    type: String,
+    required: true
+  },
   notes: {
     type: String,
     required: false,
   },
   userID: {
-    type: Number,
+    type: String,
     required: true
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
   },
   individualSubjects: [ {
     name: String,

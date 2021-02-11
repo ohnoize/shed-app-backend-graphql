@@ -11,7 +11,13 @@ const userSchema = new mongoose.Schema({
   instrument: {
     type: String,
     required: false
-  }
+  },
+  sessions: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Session'
+    }
+  ],
 });
 
 userSchema.plugin(uniqueValidator);

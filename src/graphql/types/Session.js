@@ -7,11 +7,13 @@ const typeDefs = gql`
     length: Int!
   }
   type Session {
+    date: String!
     id: ID!
     totalLength: Int
     individualSubjects: [SessionSubject]
     notes: String
-    userID: ID!
+    userID: String!
+    user: User
   }
   extend type Query {
     allSessions: [Session]

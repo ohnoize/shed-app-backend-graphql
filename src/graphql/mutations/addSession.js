@@ -1,5 +1,6 @@
 import { gql, UserInputError } from 'apollo-server';
 import Session from '../../models/session.js';
+import User from '../../models/user.js';
 // import users from '../../../data/users.js';
 // import sessions from '../../../data/sessions.js';
 
@@ -13,14 +14,15 @@ const typeDefs = gql`
     totalLength: Int!
     notes: String
     individualSubjects: [sessionSubjectInput]
-    userID: ID!
+    userID: String!
   }
   extend type Mutation {
     addSession(
+      date: String!
       totalLength: Int!,
       notes: String,
       individualSubjects: [sessionSubjectInput],
-      userID: ID!
+      userID: String!
     ): Session
   }
 `;
@@ -28,9 +30,15 @@ const typeDefs = gql`
 const resolvers = {
   Mutation: {
     addSession: async (root, args) => {
-      const session = new Session({ ...args });
+      console.log(args.userID);
+      const user = await User.findOne({ id: args.userID });
+      console.log(user);
+      const session = new Session({ ...args, user: user.id });
       try {
-        await session.save();
+        console.log(user);
+        // await session.save();
+        // user.sessions = user.sessions.concat(session.id);
+        // await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args

@@ -6,9 +6,11 @@ const typeDefs = gql`
     id: ID!
     username: String!
     instrument: String
+    sessions: [Session]
   }
-  type Token {
-    value: String!
+  type AuthPayload {
+    token: String!
+    user: User
   }
   extend type Query {
     allUsers: [User]
