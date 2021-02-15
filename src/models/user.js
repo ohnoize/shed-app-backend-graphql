@@ -8,6 +8,10 @@ const userSchema = new mongoose.Schema({
     unique: true,
     minlength: 3
   },
+  passwordHash: {
+    type: String,
+    required: true
+  },
   instrument: {
     type: String,
     required: false

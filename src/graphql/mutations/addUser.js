@@ -1,12 +1,13 @@
 import { gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
 import User from '../../models/user.js';
 import config from '../../utils/config.cjs';
 
 const typeDefs = gql`
   
   extend type Mutation {
-    addUser(username: String!, instrument: String): User
+    addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
   }
 `;
@@ -14,7 +15,13 @@ const typeDefs = gql`
 const resolvers = {
   Mutation: {
     addUser: async (root, args) => {
-      const user = new User({ ...args });
+      const saltRounds = 10;
+      const passwordHash = await bcrypt.hash(args.password, saltRounds);
+      const user = new User({
+        username: args.username,
+        instrument: args.instrument,
+        passwordHash
+      });
       try {
         await user.save();
       } catch (error) {
@@ -26,7 +33,12 @@ const resolvers = {
     },
     login: async (root, args) => {
       const user = await User.findOne({ username: args.username });
-      if (!user || args.password !== 'secret') {
+
+      const passwordCorrect = user === null
+        ? false
+        : await bcrypt.compare(args.password, user.passwordHash);
+
+      if (!(user && passwordCorrect)) {
         throw new UserInputError('wrong credentials');
       }
       const userForToken = {
