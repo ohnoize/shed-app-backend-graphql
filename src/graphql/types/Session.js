@@ -17,7 +17,7 @@ const typeDefs = gql`
     user: User
   }
   extend type Query {
-    allSessions: [Session]
+    allSessions(userID: String): [Session]
     sessionCount: Int
     findSession(id: Int): Session
   }
@@ -36,9 +36,15 @@ const resolvers = {
     }
   },
   Query: {
-    allSessions: () => Session.find({}),
+    allSessions: async (root, args) => {
+      if (args.userID) {
+        const sessions = await Session.find({});
+        return sessions.filter(s => s.userID === args.userID);
+      }
+      return Session.find({});
+    },
     sessionCount: () => Session.collection.countDocuments(),
-    findSession: (root, args) => Session.findOne({ id: args.id })
+    findSession: (root, args) => Session.findOne({ id: args.id }),
   }
 };
 
