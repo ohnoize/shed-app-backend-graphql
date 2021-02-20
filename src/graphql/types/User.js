@@ -7,6 +7,7 @@ const typeDefs = gql`
     id: ID!
     username: String!
     instrument: String
+    joined: String!
     sessions: [Session]
   }
   type AuthPayload {

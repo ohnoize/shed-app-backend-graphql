@@ -20,6 +20,7 @@ const resolvers = {
       const user = new User({
         username: args.username,
         instrument: args.instrument,
+        joined: new Date().toString(),
         passwordHash
       });
       try {
