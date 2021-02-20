@@ -21,7 +21,7 @@ mongoose.connect(config.MONGODB_URI, {
 
 const schema = createSchema();
 
-const server = new ApolloServer({
+export const server = new ApolloServer({
   schema,
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null;
