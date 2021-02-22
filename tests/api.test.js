@@ -17,7 +17,7 @@ const mongoose = require('mongoose');
 
 const { query, mutate } = createTestClient(server);
 
-describe('Adding subjects, users, and sessions, able to create user and login', () => {
+describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
   beforeEach(async (done) => {
     await Subject.deleteMany();
     await User.deleteMany();
