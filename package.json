@@ -5,7 +5,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test jest --verbose --runInBand",
+    "test": "cross-env NODE_ENV=test jest --verbose --runInBand --forceExit",
     "dev": "cross-env NODE_ENV=development nodemon src/index.js",
     "start": "cross-env NODE_ENV=production node src/index.js",
     "lint": "eslint ./src"
@@ -38,6 +38,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "@shelf/jest-mongodb": "^1.2.3",
     "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.21.0",
     "cross-env": "^7.0.3",
