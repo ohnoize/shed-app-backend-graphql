@@ -23,6 +23,8 @@ const schema = createSchema();
 
 export const server = new ApolloServer({
   schema,
+  introspection: true,
+  playground: true,
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
