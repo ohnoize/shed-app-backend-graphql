@@ -24,6 +24,8 @@ jobs:
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm test
       - name: deploy
+        env:
+          SECRET_KEY: ${{ secrets.SECRET_KEY }}
         uses: akhileshns/heroku-deploy@v3.8.9
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
