@@ -24,6 +24,7 @@ const typeDefs = gql`
       individualSubjects: [sessionSubjectInput],
       userID: String!
     ): Session
+    deleteSession(id: String!):Session
   }
 `;
 
@@ -45,7 +46,8 @@ const resolvers = {
         });
       }
       return session;
-    }
+    },
+    deleteSession: async (root, args) => Session.findByIdAndDelete(args.id)
   }
 };
 

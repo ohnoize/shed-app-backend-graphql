@@ -9,6 +9,7 @@ const typeDefs = gql`
   extend type Mutation {
     addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
+    deleteUser(id: String!): User
   }
 `;
 
@@ -49,7 +50,8 @@ const resolvers = {
       const token = jwt.sign(userForToken, config.SECRET_KEY);
 
       return { token, user };
-    }
+    },
+    deleteUser: async (root, args) => User.findByIdAndDelete(args.id)
   }
 };
 
