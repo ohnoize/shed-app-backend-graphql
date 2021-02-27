@@ -5,7 +5,7 @@ const typeDefs = gql`
   
   extend type Mutation {
     addSubject(name: String!, description: String): Subject
-    deleteSubject(id: String!): Subject
+    deleteSubject(name: String!): Subject
   }
 `;
 
@@ -23,7 +23,7 @@ const resolvers = {
       }
       return subject;
     },
-    deleteSubject: async (root, args) => Subject.findByIdAndDelete(args.id)
+    deleteSubject: async (root, args) => Subject.findOneAndDelete({ name: args.name })
   }
 };
 
