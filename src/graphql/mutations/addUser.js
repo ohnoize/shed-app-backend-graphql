@@ -10,6 +10,7 @@ const typeDefs = gql`
     addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
     deleteUser(id: String!): User
+    deleteUserByName(username: String!): User
   }
 `;
 
@@ -51,7 +52,8 @@ const resolvers = {
 
       return { token, user };
     },
-    deleteUser: async (root, args) => User.findByIdAndDelete(args.id)
+    deleteUser: async (root, args) => User.findByIdAndDelete(args.id),
+    deleteUserByName: async (root, args) => User.findOneAndDelete({ username: args.username })
   }
 };
 
