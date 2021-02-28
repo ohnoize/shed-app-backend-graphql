@@ -17,7 +17,7 @@ const resolvers = {
       try {
         await subject.save();
       } catch (error) {
-        throw new UserInputError(error.message, {
+        throw new UserInputError(`Subject ${subject.name} already exists`, {
           invalidArgs: args
         });
       }

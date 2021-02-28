@@ -28,7 +28,7 @@ const resolvers = {
       try {
         await user.save();
       } catch (error) {
-        throw new UserInputError('Shit went down', {
+        throw new UserInputError(`User ${user.username} already exists.`, {
           invalidArgs: args
         });
       }
