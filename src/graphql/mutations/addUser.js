@@ -28,7 +28,7 @@ const resolvers = {
       try {
         await user.save();
       } catch (error) {
-        throw new UserInputError(error.message, {
+        throw new UserInputError('Shit went down', {
           invalidArgs: args
         });
       }
