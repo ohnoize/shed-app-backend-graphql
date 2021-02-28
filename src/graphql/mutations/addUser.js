@@ -5,10 +5,14 @@ import User from '../../models/user.js';
 import config from '../../utils/config.cjs';
 
 const typeDefs = gql`
-  
+  input subjectNotesInput {
+    subjectID: String
+    notes: String
+  }
   extend type Mutation {
     addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
+    editUser(id: String!, subjectNotes: subjectNotesInput!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
   }
@@ -51,6 +55,27 @@ const resolvers = {
       const token = jwt.sign(userForToken, config.SECRET_KEY);
 
       return { token, user };
+    },
+    editUser: async (root, args) => {
+      const user = await User.findOne({ _id: args.id });
+      if (!user) return null;
+      const newNote = {
+        ...args.subjectNotes,
+        date: new Date().toString()
+      };
+      if (!user.subjectNotes) {
+        user.subjectNotes = newNote;
+      } else {
+        user.subjectNotes = user.subjectNotes.concat(newNote);
+      }
+      try {
+        await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args
+        });
+      }
+      return user;
     },
     deleteUser: async (root, args) => User.findByIdAndDelete(args.id),
     deleteUserByName: async (root, args) => User.findOneAndDelete({ username: args.username })

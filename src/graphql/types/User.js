@@ -3,10 +3,16 @@ import Session from '../../models/session.js';
 import User from '../../models/user.js';
 
 const typeDefs = gql`
+  type SubjectNote {
+    subjectID: String!
+    date: String!
+    notes: String!
+  }
   type User {
     id: ID!
     username: String!
     instrument: String
+    subjectNotes: [SubjectNote]
     joined: String!
     sessions: [Session]
   }

@@ -16,6 +16,13 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  subjectNotes: [
+    {
+      subjectID: String,
+      date: String,
+      notes: String
+    }
+  ],
   joined: {
     type: String,
     required: true
