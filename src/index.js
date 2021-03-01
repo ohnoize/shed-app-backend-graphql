@@ -27,11 +27,12 @@ export const server = new ApolloServer({
   playground: true,
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null;
+    console.log(req.headers);
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       const decodedToken = jwt.verify(
         auth.substring(7), config.SECRET_KEY
       );
-      const currentUser = await User.findById(decodedToken.id);
+      const currentUser = await User.findOne({ _id: decodedToken.id });
       return { currentUser };
     }
     return {};
