@@ -23,6 +23,8 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           SECRET_KEY: ${{ secrets.SECRET_KEY }}
         run: npm test
+      - name: build
+        run: npm run build
       - name: deploy
         uses: akhileshns/heroku-deploy@v3.8.9
         with:
