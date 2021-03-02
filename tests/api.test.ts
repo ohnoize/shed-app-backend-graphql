@@ -1,4 +1,5 @@
 import { createTestClient } from 'apollo-server-testing';
+import mongoose from 'mongoose';
 import { server } from '../src/index';
 import Session from '../src/models/session';
 import Subject from '../src/models/subject';
@@ -10,15 +11,14 @@ import {
   ALL_USERS,
   GET_SESSIONS,
   ADD_SESSION,
-  LOGIN
+  LOGIN,
 } from './utils';
 
-const mongoose = require('mongoose');
-
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { query, mutate } = createTestClient(server as any);
 
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
-  beforeEach(async (done) => {
+  beforeEach(async () => {
     await Subject.deleteMany();
     await User.deleteMany();
     await Session.deleteMany();
@@ -26,40 +26,37 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
       username: 'testUser',
       passwordHash: 'asfasfasf',
       instrument: 'theremin',
-      joined: new Date().toString()
+      joined: new Date().toString(),
     });
     await user.save();
-    done();
   });
-  afterAll(async (done) => {
+  afterAll(async () => {
     await mongoose.connection.close();
     await mongoose.disconnect();
-    done();
   });
 
-  test('Add subject', async (done) => {
+  test('Add subject', async () => {
     const mutateRes = await mutate({
       mutation: ADD_SUBJECT,
-      variables: { name: 'testSubject', description: 'subject for testing' }
+      variables: { name: 'testSubject', description: 'subject for testing' },
     });
 
     const queryRes = await query({
-      query: GET_SUBJECTS
+      query: GET_SUBJECTS,
     });
 
     expect(queryRes.data.allSubjects).toHaveLength(1);
     expect(mutateRes.data.addSubject.name).toEqual('testSubject');
-    done();
   });
 
-  test('Add user', async (done) => {
+  test('Add user', async () => {
     const mutateRes = await mutate({
       mutation: ADD_USER,
-      variables: { username: 'testUser2', password: 'testPassword', instrument: 'accordion' }
+      variables: { username: 'testUser2', password: 'testPassword', instrument: 'accordion' },
     });
 
     const queryRes = await query({
-      query: ALL_USERS
+      query: ALL_USERS,
     });
 
     // console.log(queryRes.data.allUsers[0].id);
@@ -70,11 +67,10 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     expect(queryRes.data.allUsers[1].username).toEqual('testUser2');
     expect(queryRes.data.allUsers[0].instrument).toEqual('theremin');
     expect(queryRes.data.allUsers[1].instrument).toEqual('accordion');
-    done();
   });
-  test('Add a session', async (done) => {
+  test('Add a session', async () => {
     const userRes = await query({
-      query: ALL_USERS
+      query: ALL_USERS,
     });
 
     await mutate({
@@ -87,53 +83,51 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         individualSubjects: [
           {
             name: 'scales',
-            length: 120
+            length: 120,
           },
           {
             name: 'chords',
-            length: 1500
-          }
-        ]
-      }
+            length: 1500,
+          },
+        ],
+      },
     });
 
     const queryRes = await query({
-      query: GET_SESSIONS
+      query: GET_SESSIONS,
     });
 
     expect(queryRes.data.allSessions).toHaveLength(1);
-    done();
   });
-  test('Sign up and login', async (done) => {
+  test('Sign up and login', async () => {
     const signUpRes = await mutate({
       mutation: ADD_USER,
-      variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' }
+      variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' },
     });
     const loginRes = await mutate({
       mutation: LOGIN,
-      variables: { username: 'testUser2', password: 'secret' }
+      variables: { username: 'testUser2', password: 'secret' },
     });
     const usersRes = await query({
-      query: ALL_USERS
+      query: ALL_USERS,
     });
 
     expect(signUpRes.data.addUser).toHaveProperty('id');
     expect(loginRes.data.login).toHaveProperty('token');
     expect(usersRes.data.allUsers[1].username).toEqual('testUser2');
-    done();
   });
 
-  test('Sign up, login, and add session', async (done) => {
+  test('Sign up, login, and add session', async () => {
     const signUpRes = await mutate({
       mutation: ADD_USER,
-      variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' }
+      variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' },
     });
     const loginRes = await mutate({
       mutation: LOGIN,
-      variables: { username: 'testUser2', password: 'secret' }
+      variables: { username: 'testUser2', password: 'secret' },
     });
     const usersRes = await query({
-      query: ALL_USERS
+      query: ALL_USERS,
     });
 
     await mutate({
@@ -146,18 +140,18 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         individualSubjects: [
           {
             name: 'scales',
-            length: 120
+            length: 120,
           },
           {
             name: 'chords',
-            length: 1500
-          }
-        ]
-      }
+            length: 1500,
+          },
+        ],
+      },
     });
 
     const sessionsRes = await query({
-      query: GET_SESSIONS
+      query: GET_SESSIONS,
     });
 
     const userID = loginRes.data.login.user.id;
@@ -174,6 +168,5 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     expect(sessionsRes.data.allSessions[0].date).toEqual('12.12.2012');
     expect(sessionsRes.data.allSessions[0]).toHaveProperty('individualSubjects');
     expect(sessionsRes.data.allSessions[0].notes).toEqual('test session');
-    done();
   }, 30000);
 });
