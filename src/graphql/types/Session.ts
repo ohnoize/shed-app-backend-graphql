@@ -1,7 +1,9 @@
 import { gql } from 'apollo-server';
-import Session from '../../models/session';
-import User from '../../models/user';
-import { UserBaseDocument } from '../../models/user';
+import Session, { SessionBaseDocument } from '../../models/session';
+import User, { UserBaseDocument } from '../../models/user';
+import { DBUserType, DBSessionType } from '../../types';
+
+// eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
 
 const typeDefs = gql`
@@ -32,18 +34,20 @@ interface Resolvers {
 
 const resolvers: Resolvers = {
   Session: {
-    user: async (root) => {
+    user: async (root: DBSessionType): Promise<DBUserType> => {
       const user: UserBaseDocument = await User.findOne({ _id: root.userID });
       return {
         id: user.id,
+        joined: user.joined,
         username: user.username,
         instrument: user.instrument,
-        sessions: user.sessions
+        sessions: user.sessions,
+        subjectNotes: user.subjectNotes,
       };
-    }
+    },
   },
   Query: {
-    allSessions: async (_root, args) => {
+    allSessions: async (_root:void, args: { userID: string }): Promise<SessionBaseDocument[]> => {
       if (args.userID) {
         const sessions = await Session.find({});
         return sessions.filter(s => s.userID === args.userID);
@@ -52,10 +56,10 @@ const resolvers: Resolvers = {
     },
     sessionCount: () => Session.collection.countDocuments(),
     findSession: (_root, args) => Session.findOne({ id: args.id }),
-  }
+  },
 };
 
 export default {
   typeDefs,
-  resolvers
+  resolvers,
 };

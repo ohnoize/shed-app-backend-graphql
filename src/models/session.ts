@@ -1,8 +1,8 @@
-import mongoose, { Document } from 'mongoose';
+import mongoose, { Document, model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
 import { SessionType } from '../types';
 
-interface SessionBaseDocument extends SessionType, Document {}
+export interface SessionBaseDocument extends SessionType, Document {}
 
 const sessionSchema = new mongoose.Schema<SessionBaseDocument>({
   totalLength: {
@@ -11,7 +11,7 @@ const sessionSchema = new mongoose.Schema<SessionBaseDocument>({
   },
   date: {
     type: String,
-    required: true
+    required: true,
   },
   notes: {
     type: String,
@@ -19,20 +19,18 @@ const sessionSchema = new mongoose.Schema<SessionBaseDocument>({
   },
   userID: {
     type: String,
-    required: true
+    required: true,
   },
   user: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
   },
   individualSubjects: [ {
     name: String,
-    length: Number
-  } ]
+    length: Number,
+  } ],
 });
 
 sessionSchema.plugin(uniqueValidator);
 
-const Session = mongoose.model('Session', sessionSchema);
-
-export default Session;
+export default model<SessionBaseDocument>('Session', sessionSchema);

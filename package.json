@@ -64,6 +64,7 @@
     "typescript": "^4.2.2"
   },
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "testPathIgnorePatterns": ["<rootDir>/build/"]
   }
 }

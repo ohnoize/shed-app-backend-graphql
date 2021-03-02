@@ -1,4 +1,6 @@
+/* eslint-disable import/no-cycle */
 import { makeExecutableSchema, gql } from 'apollo-server';
+import { GraphQLSchema } from 'graphql';
 import pkg from 'lodash';
 import Session from './types/Session';
 import Subject from './types/Subject';
@@ -18,12 +20,12 @@ export interface Context {
   currentUser: typeof User
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type ResolverFn = (root: any, args: any, ctx: Context) => any;
 
 export interface ResolverMap {
   [field: string]: ResolverFn;
 }
-
 
 const rootTypeDefs = gql`
   type Query {
@@ -42,7 +44,7 @@ const typeDefs = [
   User.typeDefs,
   addSession.typeDefs,
   addUser.typeDefs,
-  addSubject.typeDefs
+  addSubject.typeDefs,
 ];
 
 const resolvers = merge(
@@ -51,12 +53,12 @@ const resolvers = merge(
   User.resolvers,
   addSession.resolvers,
   addUser.resolvers,
-  addSubject.resolvers
+  addSubject.resolvers,
 );
 
-const createSchema = () => makeExecutableSchema({
+const createSchema = (): GraphQLSchema => makeExecutableSchema({
   typeDefs,
-  resolvers
+  resolvers,
 });
 
 export default createSchema;

@@ -1,7 +1,9 @@
 import { gql } from 'apollo-server';
+// eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
-import Session from '../../models/session';
+import Session, { SessionBaseDocument } from '../../models/session';
 import User from '../../models/user';
+import { DBUserType } from '../../types';
 
 const typeDefs = gql`
   type SubjectNote {
@@ -29,27 +31,26 @@ const typeDefs = gql`
   }
 `;
 
-
 interface Resolvers {
   Query: ResolverMap;
   User: ResolverMap;
 }
 const resolvers: Resolvers = {
   User: {
-    sessions: async (root) => {
+    sessions: async (root: DBUserType): Promise<SessionBaseDocument[]> => {
       const sessions = await Session.find({ user: root.id });
       return sessions;
-    }
+    },
   },
   Query: {
     allUsers: () => User.find({}),
     userCount: () => User.collection.countDocuments(),
     findUser: (_root, args: { id: string }) => User.findOne({ id: args.id }),
-    me: (_root, _args, context) => context.currentUser
-  }
+    me: (_root, _args, context) => context.currentUser,
+  },
 };
 
 export default {
   typeDefs,
-  resolvers
+  resolvers,
 };

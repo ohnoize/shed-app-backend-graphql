@@ -1,9 +1,17 @@
 import { gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import User from '../../models/user';
+import User, { UserBaseDocument } from '../../models/user';
 import config from '../../utils/config';
+// eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
+import {
+  AddUserType,
+  EditUserInput,
+  LoginResponse,
+  LoginType,
+  DBUserType,
+} from '../../types';
 
 const typeDefs = gql`
   input subjectNotesInput {
@@ -25,25 +33,25 @@ interface Resolvers {
 
 const resolvers: Resolvers = {
   Mutation: {
-    addUser: async (_root, args) => {
+    addUser: async (_root: DBUserType, args: AddUserType): Promise<UserBaseDocument> => {
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(args.password, saltRounds);
       const user = new User({
         username: args.username,
         instrument: args.instrument,
         joined: new Date().toString(),
-        passwordHash
+        passwordHash,
       });
       try {
         await user.save();
       } catch (error) {
         throw new UserInputError(`User ${user.username} already exists.`, {
-          invalidArgs: args
+          invalidArgs: args,
         });
       }
       return user;
     },
-    login: async (_root, args) => {
+    login: async (_root: DBUserType, args: LoginType): Promise<LoginResponse> => {
       const user = await User.findOne({ username: args.username });
 
       const passwordCorrect = user === null
@@ -61,15 +69,15 @@ const resolvers: Resolvers = {
 
       return { token, user };
     },
-    editUser: async (_root, args) => {
+    editUser: async (_root: DBUserType, args: EditUserInput): Promise<UserBaseDocument> => {
       const user = await User.findOne({ _id: args.id });
       if (!user) return null;
       const newNote = {
         ...args.subjectNotes,
-        date: new Date().toString()
+        date: new Date().toString(),
       };
       if (!user.subjectNotes) {
-        user.subjectNotes = newNote;
+        user.subjectNotes.concat(newNote);
       } else {
         user.subjectNotes = user.subjectNotes.concat(newNote);
       }
@@ -77,17 +85,17 @@ const resolvers: Resolvers = {
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
-          invalidArgs: args
+          invalidArgs: args,
         });
       }
       return user;
     },
     deleteUser: async (_root, args) => User.findByIdAndDelete(args.id),
-    deleteUserByName: async (_root, args) => User.findOneAndDelete({ username: args.username })
-  }
+    deleteUserByName: async (_root, args) => User.findOneAndDelete({ username: args.username }),
+  },
 };
 
 export default {
   typeDefs,
-  resolvers
+  resolvers,
 };

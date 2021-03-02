@@ -1,7 +1,9 @@
 import { gql, UserInputError } from 'apollo-server';
-import Session from '../../models/session';
+import Session, { SessionBaseDocument } from '../../models/session';
 import User from '../../models/user';
+// eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
+import { SessionType, DBSessionType } from '../../types';
 
 const typeDefs = gql`
   input sessionSubjectInput {
@@ -34,7 +36,7 @@ interface Resolvers {
 
 const resolvers: Resolvers = {
   Mutation: {
-    addSession: async (_root, args) => {
+    addSession: async (_root: DBSessionType, args: SessionType): Promise<SessionBaseDocument> => {
       // console.log(args.userID);
       const user = await User.findOne({ _id: args.userID });
       // console.log(user);
@@ -46,17 +48,17 @@ const resolvers: Resolvers = {
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
-          invalidArgs: args
+          invalidArgs: args,
         });
       }
       return session;
     },
     deleteSession: async (_root, args) => Session.findByIdAndDelete(args.id),
-    deleteSessionByNotes: async (_root, args) => Session.findOneAndDelete({ notes: args.notes })
-  }
+    deleteSessionByNotes: async (_root, args) => Session.findOneAndDelete({ notes: args.notes }),
+  },
 };
 
 export default {
   typeDefs,
-  resolvers
+  resolvers,
 };

@@ -14,7 +14,11 @@ export interface SessionType {
   userID: string
   date: string
   notes?: string
-  individualSubjects: SessionSubjectType[] 
+  individualSubjects: SessionSubjectType[]
+}
+
+export interface DBSessionType extends SessionType {
+  id: string
 }
 
 export interface SubjectType {
@@ -24,13 +28,41 @@ export interface SubjectType {
 }
 
 export interface UserType {
-    username: string,
-    instrument?: string,
-    sessions: SessionType[],
-    subjectNotes: SubjectNotesType[]
+  username: string,
+  joined: string,
+  instrument?: string,
+  sessions: SessionType[],
+  subjectNotes: SubjectNotesType[]
+}
+
+export interface AddUserType {
+  username: string,
+  password: string,
+  instrument?: string
+}
+
+export interface LoginType {
+  username: string,
+  password: string
+}
+
+export interface DBUserType extends UserType {
+  id: string
 }
 
 export interface TokenUserType {
   id: string,
   username: string
+}
+
+export interface LoginResponse {
+  token: string,
+  user: UserType
+}
+
+type SubjectNotesInput = Omit<SubjectNotesType, 'date'>;
+
+export interface EditUserInput {
+  id: string,
+  subjectNotes: SubjectNotesInput
 }

@@ -1,4 +1,6 @@
 import { gql } from 'apollo-server';
+// eslint-disable-next-line import/no-cycle
+import { ResolverMap } from '../schema';
 import Subject from '../../models/subject';
 
 const typeDefs = gql`
@@ -14,14 +16,18 @@ const typeDefs = gql`
   }
 `;
 
-const resolvers = {
+interface Resolvers {
+  Query: ResolverMap;
+}
+
+const resolvers: Resolvers = {
   Query: {
     allSubjects: () => Subject.find({}),
-    subjectCount: () => Subject.collection.countDocuments()
-  }
+    subjectCount: (): Promise<number> => Subject.collection.countDocuments(),
+  },
 };
 
 export default {
   typeDefs,
-  resolvers
+  resolvers,
 };

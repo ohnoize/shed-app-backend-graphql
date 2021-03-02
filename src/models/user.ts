@@ -11,43 +11,43 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
     type: String,
     required: true,
     unique: true,
-    minlength: 3
+    minlength: 3,
   },
   passwordHash: {
     type: String,
-    required: true
+    required: true,
   },
   instrument: {
     type: String,
-    required: false
+    required: false,
   },
   subjectNotes: [
     {
       subjectID: String,
       date: String,
-      notes: String
-    }
+      notes: String,
+    },
   ],
   joined: {
     type: String,
-    required: true
+    required: true,
   },
   sessions: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Session'
-    }
+      ref: 'Session',
+    },
   ],
   connections: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'User'
-    }
-  ]
+      ref: 'User',
+    },
+  ],
 });
 
 userSchema.plugin(uniqueValidator);
 
 // const User = mongoose.model('User', userSchema);
 
-export default model<UserBaseDocument>('User', userSchema)
+export default model<UserBaseDocument>('User', userSchema);
