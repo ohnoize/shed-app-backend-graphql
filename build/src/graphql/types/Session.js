@@ -50,6 +50,7 @@ const resolvers = {
         }),
     },
     Query: {
+        // eslint-disable-next-line max-len
         allSessions: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             if (args.userID) {
                 const sessions = yield session_1.default.find({});
