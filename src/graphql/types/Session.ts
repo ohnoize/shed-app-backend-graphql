@@ -47,7 +47,8 @@ const resolvers: Resolvers = {
     },
   },
   Query: {
-    allSessions: async (_root:void, args: { userID: string }): Promise<SessionBaseDocument[]> => {
+    // eslint-disable-next-line max-len
+    allSessions: async (_root:DBSessionType, args: { userID: string }): Promise<SessionBaseDocument[]> => {
       if (args.userID) {
         const sessions = await Session.find({});
         return sessions.filter(s => s.userID === args.userID);

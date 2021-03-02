@@ -3,6 +3,7 @@ import uniqueValidator from 'mongoose-unique-validator';
 import { UserType } from '../types';
 
 export interface UserBaseDocument extends UserType, Document {
+  user: { date: string; notes: string; SubjectID: string; };
   passwordHash: string
 }
 
