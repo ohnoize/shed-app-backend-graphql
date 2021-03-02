@@ -1,7 +1,7 @@
 import { createTestClient } from 'apollo-server-testing';
 import { server } from '../src/index';
 import Session from '../src/models/session';
-import Subject from '../src/models/subject.js';
+import Subject from '../src/models/subject';
 import User from '../src/models/user';
 import {
   ADD_SUBJECT,
@@ -11,11 +11,11 @@ import {
   GET_SESSIONS,
   ADD_SESSION,
   LOGIN
-} from './utils.js';
+} from './utils';
 
 const mongoose = require('mongoose');
 
-const { query, mutate } = createTestClient(server);
+const { query, mutate } = createTestClient(server as any);
 
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
   beforeEach(async (done) => {
