@@ -6,7 +6,7 @@
   "scripts": {
     "test": "cross-env NODE_ENV=test jest tests/ --verbose --runInBand --forceExit",
     "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
-    "start": "NODE_ENV=production node build/index.js",
+    "start": "NODE_ENV=production node build/src/index.js",
     "lint": "eslint ./src",
     "build": "tsc"
   },

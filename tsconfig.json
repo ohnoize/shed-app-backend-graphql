@@ -69,6 +69,6 @@
     "resolveJsonModule": true
   },
   "include": [
-    "./**/*", "./**/*.ts", "./app/**/*.tsx"
+    "./**/*", "./**/*.ts",
 ]
 }
