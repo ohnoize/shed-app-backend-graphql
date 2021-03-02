@@ -1,7 +1,12 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, model } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import { UserType } from '../types';
 
-const userSchema = new mongoose.Schema({
+export interface UserBaseDocument extends UserType, Document {
+  passwordHash: string
+}
+
+const userSchema = new mongoose.Schema<UserBaseDocument>({
   username: {
     type: String,
     required: true,
@@ -43,6 +48,6 @@ const userSchema = new mongoose.Schema({
 
 userSchema.plugin(uniqueValidator);
 
-const User = mongoose.model('User', userSchema);
+// const User = mongoose.model('User', userSchema);
 
-export default User;
+export default model<UserBaseDocument>('User', userSchema)

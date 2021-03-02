@@ -1,7 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import { SubjectType } from '../types';
 
-const subjectSchema = new mongoose.Schema({
+interface SubjectBaseDocument extends SubjectType, Document {}
+
+const subjectSchema = new mongoose.Schema<SubjectBaseDocument>({
   name: {
     type: String,
     required: true,

@@ -1,5 +1,6 @@
 import { gql, UserInputError } from 'apollo-server';
-import Subject from '../../models/subject.js';
+import Subject from '../../models/subject';
+import { ResolverMap } from '../schema';
 
 const typeDefs = gql`
   
@@ -9,9 +10,13 @@ const typeDefs = gql`
   }
 `;
 
-const resolvers = {
+interface Resolvers {
+  Mutation: ResolverMap;
+}
+
+const resolvers: Resolvers = {
   Mutation: {
-    addSubject: async (root, args) => {
+    addSubject: async (_root, args) => {
       const subject = new Subject({ ...args });
       subject.timePracticed = 0;
       try {
@@ -23,7 +28,7 @@ const resolvers = {
       }
       return subject;
     },
-    deleteSubject: async (root, args) => Subject.findOneAndDelete({ name: args.name })
+    deleteSubject: async (_root, args) => Subject.findOneAndDelete({ name: args.name })
   }
 };
 

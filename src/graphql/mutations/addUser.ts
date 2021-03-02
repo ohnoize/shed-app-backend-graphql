@@ -1,8 +1,9 @@
 import { gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
-import User from '../../models/user.js';
-import config from '../../utils/config.cjs';
+import User from '../../models/user';
+import config from '../../utils/config';
+import { ResolverMap } from '../schema';
 
 const typeDefs = gql`
   input subjectNotesInput {
@@ -18,9 +19,13 @@ const typeDefs = gql`
   }
 `;
 
-const resolvers = {
+interface Resolvers {
+  Mutation: ResolverMap;
+}
+
+const resolvers: Resolvers = {
   Mutation: {
-    addUser: async (root, args) => {
+    addUser: async (_root, args) => {
       const saltRounds = 10;
       const passwordHash = await bcrypt.hash(args.password, saltRounds);
       const user = new User({
@@ -38,7 +43,7 @@ const resolvers = {
       }
       return user;
     },
-    login: async (root, args) => {
+    login: async (_root, args) => {
       const user = await User.findOne({ username: args.username });
 
       const passwordCorrect = user === null
@@ -56,7 +61,7 @@ const resolvers = {
 
       return { token, user };
     },
-    editUser: async (root, args) => {
+    editUser: async (_root, args) => {
       const user = await User.findOne({ _id: args.id });
       if (!user) return null;
       const newNote = {
@@ -77,8 +82,8 @@ const resolvers = {
       }
       return user;
     },
-    deleteUser: async (root, args) => User.findByIdAndDelete(args.id),
-    deleteUserByName: async (root, args) => User.findOneAndDelete({ username: args.username })
+    deleteUser: async (_root, args) => User.findByIdAndDelete(args.id),
+    deleteUserByName: async (_root, args) => User.findOneAndDelete({ username: args.username })
   }
 };
 

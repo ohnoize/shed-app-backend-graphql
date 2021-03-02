@@ -2,10 +2,11 @@
 import { ApolloServer } from 'apollo-server';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import createSchema from './graphql/schema.js';
-import User from './models/user.js';
+import createSchema from './graphql/schema';
+import User, { UserBaseDocument } from './models/user';
 
-import config from './utils/config.cjs';
+import config from './utils/config';
+import { TokenUserType } from './types';
 
 console.log('Connectingg to', config.MONGODB_URI);
 
@@ -28,10 +29,10 @@ export const server = new ApolloServer({
   context: async ({ req }) => {
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      const decodedToken = jwt.verify(
+      const decodedToken: TokenUserType = <any>jwt.verify(
         auth.substring(7), config.SECRET_KEY
       );
-      const currentUser = await User.findOne({ _id: decodedToken.id });
+      const currentUser: UserBaseDocument = await User.findOne({ _id: decodedToken.id });
       return { currentUser };
     }
     return {};

@@ -1,6 +1,7 @@
 import { gql } from 'apollo-server';
-import Session from '../../models/session.js';
-import User from '../../models/user.js';
+import { ResolverMap } from '../schema';
+import Session from '../../models/session';
+import User from '../../models/user';
 
 const typeDefs = gql`
   type SubjectNote {
@@ -27,7 +28,13 @@ const typeDefs = gql`
     me: User
   }
 `;
-const resolvers = {
+
+
+interface Resolvers {
+  Query: ResolverMap;
+  User: ResolverMap;
+}
+const resolvers: Resolvers = {
   User: {
     sessions: async (root) => {
       const sessions = await Session.find({ user: root.id });
@@ -37,8 +44,8 @@ const resolvers = {
   Query: {
     allUsers: () => User.find({}),
     userCount: () => User.collection.countDocuments(),
-    findUser: (root, args) => User.findOne({ id: args.id }),
-    me: (root, args, context) => context.currentUser
+    findUser: (_root, args: { id: string }) => User.findOne({ id: args.id }),
+    me: (_root, _args, context) => context.currentUser
   }
 };
 

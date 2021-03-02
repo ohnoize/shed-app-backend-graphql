@@ -8,7 +8,7 @@ if (process.env.NODE_ENV === 'test') {
   MONGODB_URI = process.env.TEST_MONGODB_URI;
 }
 
-module.exports = {
+export default {
   PORT,
   MONGODB_URI,
   SECRET_KEY,

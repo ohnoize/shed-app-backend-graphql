@@ -1,13 +1,29 @@
 import { makeExecutableSchema, gql } from 'apollo-server';
 import pkg from 'lodash';
-import Session from './types/Session.js';
-import Subject from './types/Subject.js';
-import User from './types/User.js';
-import addSession from './mutations/addSession.js';
-import addUser from './mutations/addUser.js';
-import addSubject from './mutations/addSubject.js';
+import Session from './types/Session';
+import Subject from './types/Subject';
+import User from './types/User';
+import addSession from './mutations/addSession';
+import addUser from './mutations/addUser';
+import addSubject from './mutations/addSubject';
 
 const { merge } = pkg;
+
+export interface Context {
+  models: {
+    user: typeof User;
+    subject: typeof Subject;
+    session: typeof Session;
+  };
+  currentUser: typeof User
+}
+
+export type ResolverFn = (root: any, args: any, ctx: Context) => any;
+
+export interface ResolverMap {
+  [field: string]: ResolverFn;
+}
+
 
 const rootTypeDefs = gql`
   type Query {

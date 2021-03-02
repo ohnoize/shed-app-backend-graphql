@@ -1,5 +1,5 @@
 import { gql } from 'apollo-server';
-import Subject from '../../models/subject.js';
+import Subject from '../../models/subject';
 
 const typeDefs = gql`
   type Subject {

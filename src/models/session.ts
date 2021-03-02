@@ -1,7 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 import uniqueValidator from 'mongoose-unique-validator';
+import { SessionType } from '../types';
 
-const sessionSchema = new mongoose.Schema({
+interface SessionBaseDocument extends SessionType, Document {}
+
+const sessionSchema = new mongoose.Schema<SessionBaseDocument>({
   totalLength: {
     type: Number,
     required: true,
