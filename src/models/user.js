@@ -33,6 +33,12 @@ const userSchema = new mongoose.Schema({
       ref: 'Session'
     }
   ],
+  connections: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    }
+  ]
 });
 
 userSchema.plugin(uniqueValidator);
