@@ -4,7 +4,7 @@ export interface SessionSubjectType {
 }
 
 export interface SubjectNotesType {
-  SubjectID: string
+  subjectID: string
   date: string
   notes: string
 }
@@ -27,12 +27,27 @@ export interface SubjectType {
   timePracticed: number
 }
 
+export interface DBSubjectType extends SubjectType {
+  id: string
+}
+
+export interface AddSubjectType extends SubjectType {
+  userID: string
+}
+
+export interface MySubjectType {
+  subjectID: string,
+  subjectName: string,
+  timePracticed: number,
+  subjectNotes: SubjectNotesType[],
+}
+
 export interface UserType {
   username: string,
   joined: string,
   instrument?: string,
   sessions: SessionType[],
-  subjectNotes: SubjectNotesType[]
+  mySubjects: MySubjectType[]
 }
 
 export interface AddUserType {

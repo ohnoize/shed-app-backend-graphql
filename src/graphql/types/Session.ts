@@ -42,7 +42,7 @@ const resolvers: Resolvers = {
         username: user.username,
         instrument: user.instrument,
         sessions: user.sessions,
-        subjectNotes: user.subjectNotes,
+        mySubjects: user.mySubjects,
       };
     },
   },

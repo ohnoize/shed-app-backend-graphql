@@ -11,11 +11,17 @@ const typeDefs = gql`
     date: String!
     notes: String!
   }
+  type MySubject {
+    subjectID: String!
+    subjectName: String!
+    timePracticed: Int!
+    subjectNotes: [SubjectNote]
+  }
   type User {
     id: ID!
     username: String!
     instrument: String
-    subjectNotes: [SubjectNote]
+    mySubjects: [MySubject]
     joined: String!
     sessions: [Session]
   }

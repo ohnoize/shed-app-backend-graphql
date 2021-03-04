@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "test": "cross-env NODE_ENV=test jest tests/ --verbose --runInBand --forceExit",
-    "dev": "cross-env NODE_ENV=development ts-node-dev src/index.ts",
+    "dev": "NODE_ENV=development ts-node src/index.ts",
     "start": "NODE_ENV=production node build/src/index.js",
     "lint": "eslint ./src",
     "build": "tsc"
@@ -36,6 +36,7 @@
     "mongoose": "^5.11.15",
     "mongoose-unique-validator": "^2.0.3",
     "nodemon": "^2.0.7",
+    "ts-node-dev": "^1.1.6",
     "uuid": "^8.3.2"
   },
   "devDependencies": {

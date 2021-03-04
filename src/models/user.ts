@@ -3,7 +3,6 @@ import uniqueValidator from 'mongoose-unique-validator';
 import { UserType } from '../types';
 
 export interface UserBaseDocument extends UserType, Document {
-  user: { date: string; notes: string; SubjectID: string; };
   passwordHash: string
 }
 
@@ -22,11 +21,27 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
     type: String,
     required: false,
   },
-  subjectNotes: [
+  mySubjects: [
     {
-      subjectID: String,
-      date: String,
-      notes: String,
+      subjectID: {
+        type: String,
+        required: true,
+      },
+      subjectName: {
+        type: String,
+        required: true,
+      },
+      timePracticed: Number,
+      subjectNotes: [
+        {
+          subjectID: {
+            type: String,
+            required: true,
+          },
+          date: String,
+          notes: String,
+        },
+      ],
     },
   ],
   joined: {

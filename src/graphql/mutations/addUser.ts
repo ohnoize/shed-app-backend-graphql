@@ -71,16 +71,17 @@ const resolvers: Resolvers = {
     },
     editUser: async (_root: DBUserType, args: EditUserInput): Promise<UserBaseDocument> => {
       const user = await User.findOne({ _id: args.id });
+      // console.log('args:', args);
       if (!user) return null;
       const newNote = {
         ...args.subjectNotes,
         date: new Date().toString(),
       };
-      if (!user.subjectNotes) {
-        user.subjectNotes.concat(newNote);
-      } else {
-        user.subjectNotes = user.subjectNotes.concat(newNote);
-      }
+      const subject = user.mySubjects.find((s) => s.subjectID === newNote.subjectID);
+      subject.subjectNotes = subject.subjectNotes.concat(newNote);
+      // console.log(subject);
+      user.mySubjects.map((s) => (s.subjectID === newNote.subjectID ? subject : s));
+      // console.log(user.mySubjects[0].subjectNotes);
       try {
         await user.save();
       } catch (error) {
