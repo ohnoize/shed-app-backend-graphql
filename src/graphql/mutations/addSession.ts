@@ -3,7 +3,7 @@ import Session, { SessionBaseDocument } from '../../models/session';
 import User from '../../models/user';
 // eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
-import { SessionType, DBSessionType } from '../../types';
+import { DBSessionType, SessionInput } from '../../types';
 
 const typeDefs = gql`
   input sessionSubjectInput {
@@ -19,7 +19,6 @@ const typeDefs = gql`
   }
   extend type Mutation {
     addSession(
-      date: String!
       totalLength: Int!,
       notes: String,
       individualSubjects: [sessionSubjectInput],
@@ -36,16 +35,29 @@ interface Resolvers {
 
 const resolvers: Resolvers = {
   Mutation: {
-    addSession: async (_root: DBSessionType, args: SessionType): Promise<SessionBaseDocument> => {
-      // console.log(args.userID);
+    addSession: async (_root: DBSessionType, args: SessionInput): Promise<SessionBaseDocument> => {
       const user = await User.findOne({ _id: args.userID });
-      // console.log(user);
       const session = new Session({ ...args, user: user.id });
-      // console.log(session);
+      session.date = new Date().toString();
       try {
         await session.save();
         user.sessions = user.sessions.concat(session.id);
         await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
+      session.individualSubjects.forEach((i) => {
+        const subject = user.mySubjects.find((s) => s.subjectName === i.name);
+        // console.log(subject);
+        if (subject) {
+          subject.timePracticed += i.length;
+          user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
+        }
+      });
+      try {
+        user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,

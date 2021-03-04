@@ -77,6 +77,8 @@ export interface LoginResponse {
 
 type SubjectNotesInput = Omit<SubjectNotesType, 'date'>;
 
+export type SessionInput = Omit<SessionType, 'date'>;
+
 export interface EditUserInput {
   id: string,
   subjectNotes: SubjectNotesInput
