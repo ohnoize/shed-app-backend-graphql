@@ -1,9 +1,10 @@
 import { gql, UserInputError } from 'apollo-server';
 import Session, { SessionBaseDocument } from '../../models/session';
+import Subject from '../../models/subject';
 import User from '../../models/user';
 // eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
-import { DBSessionType, SessionInput } from '../../types';
+import { DBSessionType, MySubjectType, SessionInput } from '../../types';
 
 const typeDefs = gql`
   input sessionSubjectInput {
@@ -39,6 +40,7 @@ const resolvers: Resolvers = {
       const user = await User.findOne({ _id: args.userID });
       const session = new Session({ ...args, user: user.id });
       session.date = new Date().toString();
+      const subjects = await Subject.find({});
       try {
         await session.save();
         user.sessions = user.sessions.concat(session.id);
@@ -54,6 +56,18 @@ const resolvers: Resolvers = {
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
+        } else {
+          const subjectToAdd = subjects.find((s) => s.name === i.name);
+          const newSubject: MySubjectType = {
+            subjectID: subjectToAdd.id,
+            subjectName: i.name,
+            timePracticed: i.length,
+            subjectNotes: [],
+          };
+          user.mySubjects = [
+            ...user.mySubjects,
+            newSubject,
+          ];
         }
       });
       try {
