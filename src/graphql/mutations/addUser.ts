@@ -74,13 +74,13 @@ const resolvers: Resolvers = {
       // console.log('args:', args);
       if (!user) return null;
       const newNote = {
-        ...args.subjectNotes,
+        notes: args.subjectNotes.notes,
         date: new Date().toString(),
       };
-      const subject = user.mySubjects.find((s) => s.subjectID === newNote.subjectID);
+      const subject = user.mySubjects.find((s) => s.subjectID === args.subjectNotes.subjectID);
       subject.subjectNotes = subject.subjectNotes.concat(newNote);
       // console.log(subject);
-      user.mySubjects.map((s) => (s.subjectID === newNote.subjectID ? subject : s));
+      user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
       // console.log(user.mySubjects[0].subjectNotes);
       try {
         await user.save();

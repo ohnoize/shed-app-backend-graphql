@@ -34,10 +34,6 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
       timePracticed: Number,
       subjectNotes: [
         {
-          subjectID: {
-            type: String,
-            required: true,
-          },
           date: String,
           notes: String,
         },

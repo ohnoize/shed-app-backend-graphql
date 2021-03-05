@@ -4,7 +4,6 @@ export interface SessionSubjectType {
 }
 
 export interface SubjectNotesType {
-  subjectID: string
   date: string
   notes: string
 }
@@ -77,9 +76,13 @@ export interface LoginResponse {
 
 type SubjectNotesInput = Omit<SubjectNotesType, 'date'>;
 
+export interface SubjectNotesInputExtra extends SubjectNotesInput {
+  subjectID: string
+}
+
 export type SessionInput = Omit<SessionType, 'date'>;
 
 export interface EditUserInput {
   id: string,
-  subjectNotes: SubjectNotesInput
+  subjectNotes: SubjectNotesInputExtra
 }

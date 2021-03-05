@@ -7,7 +7,6 @@ import { DBUserType } from '../../types';
 
 const typeDefs = gql`
   type SubjectNote {
-    subjectID: String!
     date: String!
     notes: String!
   }
