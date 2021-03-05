@@ -2,6 +2,7 @@ import { gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User, { UserBaseDocument } from '../../models/user';
+import Subject from '../../models/subject';
 import config from '../../utils/config';
 // eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
@@ -11,6 +12,7 @@ import {
   LoginResponse,
   LoginType,
   DBUserType,
+  MySubjectType,
 } from '../../types';
 
 const typeDefs = gql`
@@ -78,10 +80,22 @@ const resolvers: Resolvers = {
         date: new Date().toString(),
       };
       const subject = user.mySubjects.find((s) => s.subjectID === args.subjectNotes.subjectID);
-      subject.subjectNotes = subject.subjectNotes.concat(newNote);
-      // console.log(subject);
-      user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
-      // console.log(user.mySubjects[0].subjectNotes);
+      if (subject) {
+        subject.subjectNotes = subject.subjectNotes.concat(newNote);
+        user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
+      } else {
+        const subjectToAdd = await Subject.findOne({ _id: args.subjectNotes.subjectID });
+        const newSubject: MySubjectType = {
+          subjectID: subjectToAdd.id,
+          subjectName: subjectToAdd.name,
+          timePracticed: 0,
+          subjectNotes: [ newNote ],
+        };
+        user.mySubjects = [
+          ...user.mySubjects,
+          newSubject,
+        ];
+      }
       try {
         await user.save();
       } catch (error) {
