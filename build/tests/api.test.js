@@ -22,11 +22,12 @@ const utils_1 = require("./utils");
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const { query, mutate } = apollo_server_testing_1.createTestClient(index_1.server);
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
+    let user;
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
         yield subject_1.default.deleteMany();
         yield user_1.default.deleteMany();
         yield session_1.default.deleteMany();
-        const user = new user_1.default({
+        user = new user_1.default({
             username: 'testUser',
             passwordHash: 'asfasfasf',
             instrument: 'theremin',
@@ -41,7 +42,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     test('Add subject', () => __awaiter(void 0, void 0, void 0, function* () {
         const mutateRes = yield mutate({
             mutation: utils_1.ADD_SUBJECT,
-            variables: { name: 'testSubject', description: 'subject for testing' },
+            variables: { name: 'testSubject', description: 'subject for testing', userID: user.id },
         });
         const queryRes = yield query({
             query: utils_1.GET_SUBJECTS,
@@ -66,16 +67,23 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         expect(queryRes.data.allUsers[1].instrument).toEqual('accordion');
     }));
     test('Add a session', () => __awaiter(void 0, void 0, void 0, function* () {
-        const userRes = yield query({
+        const usersRes = yield query({
             query: utils_1.ALL_USERS,
+        });
+        yield mutate({
+            mutation: utils_1.ADD_SUBJECT,
+            variables: { name: 'chords', description: 'chords for testing', userID: user.id },
+        });
+        yield mutate({
+            mutation: utils_1.ADD_SUBJECT,
+            variables: { name: 'scales', description: 'scales for testing', userID: user.id },
         });
         yield mutate({
             mutation: utils_1.ADD_SESSION,
             variables: {
                 totalLength: 1200,
-                userID: userRes.data.allUsers[0].id,
+                userID: usersRes.data.allUsers[0].id,
                 notes: 'test session',
-                date: '12.12.2012',
                 individualSubjects: [
                     {
                         name: 'scales',
@@ -127,7 +135,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
                 totalLength: 1200,
                 userID: loginRes.data.login.user.id,
                 notes: 'test session',
-                date: '12.12.2012',
                 individualSubjects: [
                     {
                         name: 'scales',
@@ -153,7 +160,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         expect(sessionsRes.data.allSessions[0]).toHaveProperty('userID');
         expect(sessionsRes.data.allSessions[0].userID).toEqual(userID);
         expect(sessionsRes.data.allSessions[0]).toHaveProperty('date');
-        expect(sessionsRes.data.allSessions[0].date).toEqual('12.12.2012');
         expect(sessionsRes.data.allSessions[0]).toHaveProperty('individualSubjects');
         expect(sessionsRes.data.allSessions[0].notes).toEqual('test session');
     }), 30000);

@@ -39,11 +39,23 @@ const userSchema = new mongoose_1.default.Schema({
         type: String,
         required: false,
     },
-    subjectNotes: [
+    mySubjects: [
         {
-            subjectID: String,
-            date: String,
-            notes: String,
+            subjectID: {
+                type: String,
+                required: true,
+            },
+            subjectName: {
+                type: String,
+                required: true,
+            },
+            timePracticed: Number,
+            subjectNotes: [
+                {
+                    date: String,
+                    notes: String,
+                },
+            ],
         },
     ],
     joined: {

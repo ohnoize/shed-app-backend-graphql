@@ -3,8 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.LOGIN = exports.GET_SESSIONS = exports.ADD_SESSION = exports.ALL_USERS = exports.ADD_USER = exports.GET_SUBJECTS = exports.ADD_SUBJECT = void 0;
 const apollo_server_1 = require("apollo-server");
 exports.ADD_SUBJECT = apollo_server_1.gql `
-  mutation addSubject($name: String!, $description: String) {
-    addSubject(name: $name, description: $description) {
+  mutation addSubject($name: String!, $description: String, $userID: String) {
+    addSubject(name: $name, description: $description, userID: $userID) {
       name
       description
       id
@@ -44,7 +44,6 @@ exports.ADD_SESSION = apollo_server_1.gql `
         $totalLength: Int!,
         $individualSubjects: [sessionSubjectInput!]!,
         $notes: String,
-        $date: String!
         $userID: String!,
       ) {
         addSession(
@@ -52,7 +51,6 @@ exports.ADD_SESSION = apollo_server_1.gql `
           totalLength: $totalLength
           notes: $notes
           individualSubjects: $individualSubjects
-          date: $date
       ) {
         id
         date
@@ -67,8 +65,8 @@ exports.ADD_SESSION = apollo_server_1.gql `
     }
   `;
 exports.GET_SESSIONS = apollo_server_1.gql `
-      query allSessions($userID:String){
-        allSessions(userID: $userID) {
+      query {
+        allSessions {
           id
           date
           totalLength

@@ -68,15 +68,18 @@ const resolvers = {
         }),
         editUser: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             const user = yield user_1.default.findOne({ _id: args.id });
+            // console.log('args:', args);
             if (!user)
                 return null;
-            const newNote = Object.assign(Object.assign({}, args.subjectNotes), { date: new Date().toString() });
-            if (!user.subjectNotes) {
-                user.subjectNotes.concat(newNote);
-            }
-            else {
-                user.subjectNotes = user.subjectNotes.concat(newNote);
-            }
+            const newNote = {
+                notes: args.subjectNotes.notes,
+                date: new Date().toString(),
+            };
+            const subject = user.mySubjects.find((s) => s.subjectID === args.subjectNotes.subjectID);
+            subject.subjectNotes = subject.subjectNotes.concat(newNote);
+            // console.log(subject);
+            user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
+            // console.log(user.mySubjects[0].subjectNotes);
             try {
                 yield user.save();
             }

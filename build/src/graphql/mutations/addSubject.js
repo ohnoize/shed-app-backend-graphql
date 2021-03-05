@@ -14,23 +14,38 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const subject_1 = __importDefault(require("../../models/subject"));
+const user_1 = __importDefault(require("../../models/user"));
 const typeDefs = apollo_server_1.gql `
   
   extend type Mutation {
-    addSubject(name: String!, description: String): Subject
+    addSubject(name: String!, description: String, userID: String): Subject
     deleteSubject(name: String!): Subject
   }
 `;
 const resolvers = {
     Mutation: {
+        // eslint-disable-next-line max-len
         addSubject: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             const subject = new subject_1.default(Object.assign({}, args));
             subject.timePracticed = 0;
+            const user = yield user_1.default.findOne({ _id: args.userID });
+            const userSubject = {
+                subjectID: subject.id,
+                subjectName: subject.name,
+                timePracticed: 0,
+                subjectNotes: [],
+            };
+            user.mySubjects = [
+                ...user.mySubjects,
+                userSubject,
+            ];
+            // console.log(user);
             try {
                 yield subject.save();
+                yield user.save();
             }
             catch (error) {
-                throw new apollo_server_1.UserInputError(`Subject ${subject.name} already exists`, {
+                throw new apollo_server_1.UserInputError(error.message, {
                     invalidArgs: args,
                 });
             }

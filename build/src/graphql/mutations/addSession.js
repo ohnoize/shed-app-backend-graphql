@@ -29,7 +29,6 @@ const typeDefs = apollo_server_1.gql `
   }
   extend type Mutation {
     addSession(
-      date: String!
       totalLength: Int!,
       notes: String,
       individualSubjects: [sessionSubjectInput],
@@ -42,15 +41,29 @@ const typeDefs = apollo_server_1.gql `
 const resolvers = {
     Mutation: {
         addSession: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
-            // console.log(args.userID);
             const user = yield user_1.default.findOne({ _id: args.userID });
-            // console.log(user);
             const session = new session_1.default(Object.assign(Object.assign({}, args), { user: user.id }));
-            // console.log(session);
+            session.date = new Date().toString();
             try {
                 yield session.save();
                 user.sessions = user.sessions.concat(session.id);
                 yield user.save();
+            }
+            catch (error) {
+                throw new apollo_server_1.UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            session.individualSubjects.forEach((i) => {
+                const subject = user.mySubjects.find((s) => s.subjectName === i.name);
+                // console.log(subject);
+                if (subject) {
+                    subject.timePracticed += i.length;
+                    user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
+                }
+            });
+            try {
+                user.save();
             }
             catch (error) {
                 throw new apollo_server_1.UserInputError(error.message, {

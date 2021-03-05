@@ -17,15 +17,20 @@ const session_1 = __importDefault(require("../../models/session"));
 const user_1 = __importDefault(require("../../models/user"));
 const typeDefs = apollo_server_1.gql `
   type SubjectNote {
-    subjectID: String!
     date: String!
     notes: String!
+  }
+  type MySubject {
+    subjectID: String!
+    subjectName: String!
+    timePracticed: Int!
+    subjectNotes: [SubjectNote]
   }
   type User {
     id: ID!
     username: String!
     instrument: String
-    subjectNotes: [SubjectNote]
+    mySubjects: [MySubject]
     joined: String!
     sessions: [Session]
   }
