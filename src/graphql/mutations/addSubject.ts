@@ -30,7 +30,6 @@ const resolvers: Resolvers = {
         timePracticed: 0,
         subjectNotes: [],
       };
-      console.log(userSubject);
       user.mySubjects = [
         ...user.mySubjects,
         userSubject,
