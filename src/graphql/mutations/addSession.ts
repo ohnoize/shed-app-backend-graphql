@@ -50,16 +50,18 @@ const resolvers: Resolvers = {
           invalidArgs: args,
         });
       }
-      session.individualSubjects.forEach((i) => {
+      session.individualSubjects.forEach(async (i) => {
+        const dbSubject = subjects.find((s) => s.name === i.name);
+        dbSubject.timePracticed += i.length;
+        await dbSubject.save();
         const subject = user.mySubjects.find((s) => s.subjectName === i.name);
         // console.log(subject);
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
         } else {
-          const subjectToAdd = subjects.find((s) => s.name === i.name);
           const newSubject: MySubjectType = {
-            subjectID: subjectToAdd.id,
+            subjectID: dbSubject.id,
             subjectName: i.name,
             timePracticed: i.length,
             subjectNotes: [],
