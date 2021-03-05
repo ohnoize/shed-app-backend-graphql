@@ -40,7 +40,7 @@ export const server = new ApolloServer({
   },
 });
 
-server.listen({ port: config.PORT }).then(({ url }) => {
+server.listen({ port: process.env.port || config.PORT }).then(({ url }) => {
   // eslint-disable-next-line no-console
   console.log(`Server ready at ${url}`);
 });

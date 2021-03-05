@@ -1,8 +1,8 @@
 import { gql } from 'apollo-server';
 
 export const ADD_SUBJECT = gql`
-  mutation addSubject($name: String!, $description: String) {
-    addSubject(name: $name, description: $description) {
+  mutation addSubject($name: String!, $description: String, $userID: String) {
+    addSubject(name: $name, description: $description, userID: $userID) {
       name
       description
       id
@@ -45,7 +45,6 @@ export const ADD_SESSION = gql`
         $totalLength: Int!,
         $individualSubjects: [sessionSubjectInput!]!,
         $notes: String,
-        $date: String!
         $userID: String!,
       ) {
         addSession(
@@ -53,7 +52,6 @@ export const ADD_SESSION = gql`
           totalLength: $totalLength
           notes: $notes
           individualSubjects: $individualSubjects
-          date: $date
       ) {
         id
         date
@@ -68,8 +66,8 @@ export const ADD_SESSION = gql`
     }
   `;
 export const GET_SESSIONS = gql`
-      query allSessions($userID:String){
-        allSessions(userID: $userID) {
+      query {
+        allSessions {
           id
           date
           totalLength

@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import { server } from '../src/index';
 import Session from '../src/models/session';
 import Subject from '../src/models/subject';
-import User from '../src/models/user';
+import User, { UserBaseDocument } from '../src/models/user';
 import {
   ADD_SUBJECT,
   GET_SUBJECTS,
@@ -18,11 +18,12 @@ import {
 const { query, mutate } = createTestClient(server as any);
 
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
+  let user: UserBaseDocument;
   beforeEach(async () => {
     await Subject.deleteMany();
     await User.deleteMany();
     await Session.deleteMany();
-    const user = new User({
+    user = new User({
       username: 'testUser',
       passwordHash: 'asfasfasf',
       instrument: 'theremin',
@@ -38,7 +39,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
   test('Add subject', async () => {
     const mutateRes = await mutate({
       mutation: ADD_SUBJECT,
-      variables: { name: 'testSubject', description: 'subject for testing' },
+      variables: { name: 'testSubject', description: 'subject for testing', userID: user.id },
     });
 
     const queryRes = await query({
@@ -69,17 +70,23 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     expect(queryRes.data.allUsers[1].instrument).toEqual('accordion');
   });
   test('Add a session', async () => {
-    const userRes = await query({
+    const usersRes = await query({
       query: ALL_USERS,
     });
-
     await mutate({
+      mutation: ADD_SUBJECT,
+      variables: { name: 'chords', description: 'chords for testing', userID: user.id },
+    });
+    await mutate({
+      mutation: ADD_SUBJECT,
+      variables: { name: 'scales', description: 'scales for testing', userID: user.id },
+    });
+    const mutateRes = await mutate({
       mutation: ADD_SESSION,
       variables: {
         totalLength: 1200,
-        userID: userRes.data.allUsers[0].id,
+        userID: usersRes.data.allUsers[0].id,
         notes: 'test session',
-        date: '12.12.2012',
         individualSubjects: [
           {
             name: 'scales',
@@ -92,7 +99,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         ],
       },
     });
-
+    console.log(mutateRes);
     const queryRes = await query({
       query: GET_SESSIONS,
     });
@@ -136,7 +143,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         totalLength: 1200,
         userID: loginRes.data.login.user.id,
         notes: 'test session',
-        date: '12.12.2012',
         individualSubjects: [
           {
             name: 'scales',
@@ -165,7 +171,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     expect(sessionsRes.data.allSessions[0]).toHaveProperty('userID');
     expect(sessionsRes.data.allSessions[0].userID).toEqual(userID);
     expect(sessionsRes.data.allSessions[0]).toHaveProperty('date');
-    expect(sessionsRes.data.allSessions[0].date).toEqual('12.12.2012');
     expect(sessionsRes.data.allSessions[0]).toHaveProperty('individualSubjects');
     expect(sessionsRes.data.allSessions[0].notes).toEqual('test session');
   }, 30000);
