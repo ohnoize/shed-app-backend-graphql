@@ -31,6 +31,7 @@ const sessionSchema = new mongoose.Schema<SessionBaseDocument>({
   } ],
 });
 
-sessionSchema.plugin(uniqueValidator);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+sessionSchema.plugin(uniqueValidator as any);
 
 export default model<SessionBaseDocument>('Session', sessionSchema);

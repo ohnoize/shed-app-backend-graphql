@@ -40,7 +40,6 @@ const resolvers: Resolvers = {
       const user = await User.findOne({ _id: args.userID });
       const session = new Session({ ...args, user: user.id });
       session.date = new Date().toString();
-      const subjects = await Subject.find({});
       try {
         await session.save();
         user.sessions = user.sessions.concat(session.id);
@@ -51,11 +50,10 @@ const resolvers: Resolvers = {
         });
       }
       session.individualSubjects.forEach(async (i) => {
-        const dbSubject = subjects.find((s) => s.name === i.name);
+        const dbSubject = await Subject.findOne({ name: i.name });
         dbSubject.timePracticed += i.length;
         await dbSubject.save();
         const subject = user.mySubjects.find((s) => s.subjectName === i.name);
-        // console.log(subject);
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
@@ -73,7 +71,8 @@ const resolvers: Resolvers = {
         }
       });
       try {
-        user.save();
+        console.log(user);
+        await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,

@@ -2,7 +2,7 @@ import { createTestClient } from 'apollo-server-testing';
 import mongoose from 'mongoose';
 import { server } from '../src/index';
 import Session from '../src/models/session';
-import Subject from '../src/models/subject';
+import Subject, { SubjectBaseDocument } from '../src/models/subject';
 import User, { UserBaseDocument } from '../src/models/user';
 import {
   ADD_SUBJECT,
@@ -19,10 +19,13 @@ const { query, mutate } = createTestClient(server as any);
 
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
   let user: UserBaseDocument;
+  let subject1: SubjectBaseDocument;
+  let subject2: SubjectBaseDocument;
   beforeEach(async () => {
     await Subject.deleteMany();
     await User.deleteMany();
     await Session.deleteMany();
+
     user = new User({
       username: 'testUser',
       passwordHash: 'asfasfasf',
@@ -30,7 +33,22 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
       joined: new Date().toString(),
     });
     await user.save();
+    subject1 = new Subject({
+      name: 'chords',
+      description: 'chords for testing',
+      userID: user.id,
+      timePracticed: 0,
+    });
+    subject2 = new Subject({
+      name: 'scales',
+      description: 'scales for testing',
+      userID: user.id,
+      timePracticed: 0,
+    });
+    await subject1.save();
+    await subject2.save();
   });
+
   afterAll(async () => {
     await mongoose.connection.close();
     await mongoose.disconnect();
@@ -39,14 +57,14 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
   test('Add subject', async () => {
     const mutateRes = await mutate({
       mutation: ADD_SUBJECT,
+      // eslint-disable-next-line no-underscore-dangle
       variables: { name: 'testSubject', description: 'subject for testing', userID: user.id },
     });
 
     const queryRes = await query({
       query: GET_SUBJECTS,
     });
-
-    expect(queryRes.data.allSubjects).toHaveLength(1);
+    expect(queryRes.data.allSubjects).toHaveLength(3);
     expect(mutateRes.data.addSubject.name).toEqual('testSubject');
   });
 
@@ -73,14 +91,14 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     const usersRes = await query({
       query: ALL_USERS,
     });
-    await mutate({
-      mutation: ADD_SUBJECT,
-      variables: { name: 'chords', description: 'chords for testing', userID: user.id },
-    });
-    await mutate({
-      mutation: ADD_SUBJECT,
-      variables: { name: 'scales', description: 'scales for testing', userID: user.id },
-    });
+    // await mutate({
+    //   mutation: ADD_SUBJECT,
+    //   variables: { name: 'chords', description: 'chords for testing', userID: user.id },
+    // });
+    // await mutate({
+    //   mutation: ADD_SUBJECT,
+    //   variables: { name: 'scales', description: 'scales for testing', userID: user.id },
+    // });
     await mutate({
       mutation: ADD_SESSION,
       variables: {
@@ -110,6 +128,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
       mutation: ADD_USER,
       variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' },
     });
+    // console.log(signUpRes.data.addUser);
     const loginRes = await mutate({
       mutation: LOGIN,
       variables: { username: 'testUser2', password: 'secret' },

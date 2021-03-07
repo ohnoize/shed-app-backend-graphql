@@ -58,7 +58,8 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
   ],
 });
 
-userSchema.plugin(uniqueValidator);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+userSchema.plugin(uniqueValidator as any);
 
 // const User = mongoose.model('User', userSchema);
 

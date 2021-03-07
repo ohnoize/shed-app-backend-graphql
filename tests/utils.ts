@@ -15,6 +15,7 @@ export const GET_SUBJECTS = gql`
           id
           name
           description
+          timePracticed
         }
     }
 `;

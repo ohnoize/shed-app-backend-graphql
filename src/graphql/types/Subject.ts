@@ -8,7 +8,7 @@ const typeDefs = gql`
     id: ID!
     name: String
     description: String
-    timePracticed: Int
+    timePracticed: Int!
   }
   extend type Query {
     allSubjects: [Subject]

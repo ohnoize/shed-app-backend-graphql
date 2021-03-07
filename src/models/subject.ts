@@ -20,6 +20,7 @@ const subjectSchema = new mongoose.Schema<SubjectBaseDocument>({
   },
 });
 
-subjectSchema.plugin(uniqueValidator);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+subjectSchema.plugin(uniqueValidator as any);
 
 export default model<SubjectBaseDocument>('Subject', subjectSchema);

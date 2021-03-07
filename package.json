@@ -52,7 +52,6 @@
     "@types/mongoose-unique-validator": "^1.0.4",
     "@typescript-eslint/eslint-plugin": "^4.16.1",
     "@typescript-eslint/parser": "^4.16.1",
-    "apollo-server-integration-testing": "^2.3.0",
     "apollo-server-testing": "^2.21.0",
     "cross-env": "^7.0.3",
     "eslint": "^7.19.0",
