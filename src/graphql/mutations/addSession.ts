@@ -71,7 +71,6 @@ const resolvers: Resolvers = {
         }
       });
       try {
-        console.log(user);
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
