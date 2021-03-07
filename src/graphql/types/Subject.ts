@@ -4,11 +4,16 @@ import { ResolverMap } from '../schema';
 import Subject from '../../models/subject';
 
 const typeDefs = gql`
+  type SubjectLink {
+    url: String!
+    description: String!
+  }
   type Subject {
     id: ID!
     name: String
     description: String
     timePracticed: Int!
+    links: [SubjectLink]
   }
   extend type Query {
     allSubjects: [Subject]

@@ -18,6 +18,12 @@ const subjectSchema = new mongoose.Schema<SubjectBaseDocument>({
     type: Number,
     required: true,
   },
+  links: [
+    {
+      url: String,
+      description: String,
+    },
+  ],
 });
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

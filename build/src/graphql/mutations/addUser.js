@@ -16,6 +16,7 @@ const apollo_server_1 = require("apollo-server");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../../models/user"));
+const subject_1 = __importDefault(require("../../models/subject"));
 const config_1 = __importDefault(require("../../utils/config"));
 const typeDefs = apollo_server_1.gql `
   input subjectNotesInput {
@@ -76,10 +77,23 @@ const resolvers = {
                 date: new Date().toString(),
             };
             const subject = user.mySubjects.find((s) => s.subjectID === args.subjectNotes.subjectID);
-            subject.subjectNotes = subject.subjectNotes.concat(newNote);
-            // console.log(subject);
-            user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
-            // console.log(user.mySubjects[0].subjectNotes);
+            if (subject) {
+                subject.subjectNotes = subject.subjectNotes.concat(newNote);
+                user.mySubjects.map((s) => (s.subjectID === subject.subjectID ? subject : s));
+            }
+            else {
+                const subjectToAdd = yield subject_1.default.findOne({ _id: args.subjectNotes.subjectID });
+                const newSubject = {
+                    subjectID: subjectToAdd.id,
+                    subjectName: subjectToAdd.name,
+                    timePracticed: 0,
+                    subjectNotes: [newNote],
+                };
+                user.mySubjects = [
+                    ...user.mySubjects,
+                    newSubject,
+                ];
+            }
             try {
                 yield user.save();
             }

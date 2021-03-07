@@ -1,14 +1,27 @@
 import { gql, UserInputError } from 'apollo-server';
 import Subject, { SubjectBaseDocument } from '../../models/subject';
 import User from '../../models/user';
-import { AddSubjectType, DBSubjectType, MySubjectType } from '../../types';
+import {
+  AddLinkType, AddSubjectType, DBSubjectType, MySubjectType,
+} from '../../types';
 // eslint-disable-next-line import/no-cycle
 import { ResolverMap } from '../schema';
 
 const typeDefs = gql`
-  
+
+  input SubjectLinkInput {
+    url: String
+    description: String
+  }
+
   extend type Mutation {
-    addSubject(name: String!, description: String, userID: String): Subject
+    addSubject(
+      name: String!, 
+      description: String, 
+      userID: String, 
+      links: [SubjectLinkInput]
+    ): Subject
+    addLink(subjectID: String!, url: String!, description: String!): Subject
     deleteSubject(name: String!): Subject
   }
 `;
@@ -38,6 +51,25 @@ const resolvers: Resolvers = {
       try {
         await subject.save();
         await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
+      return subject;
+    },
+    addLink: async (_root: DBSubjectType, args: AddLinkType): Promise<SubjectBaseDocument> => {
+      const subject = await Subject.findOne({ _id: args.subjectID });
+      const newLink = {
+        url: args.url,
+        description: args.description,
+      };
+      subject.links = [
+        ...subject.links,
+        newLink,
+      ];
+      try {
+        await subject.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,

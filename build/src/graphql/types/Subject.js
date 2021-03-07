@@ -6,11 +6,16 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const subject_1 = __importDefault(require("../../models/subject"));
 const typeDefs = apollo_server_1.gql `
+  type SubjectLink {
+    url: String!
+    description: String!
+  }
   type Subject {
     id: ID!
     name: String
     description: String
-    timePracticed: Int
+    timePracticed: Int!
+    links: [SubjectLink]
   }
   extend type Query {
     allSubjects: [Subject]

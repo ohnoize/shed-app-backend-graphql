@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
 const session_1 = __importDefault(require("../../models/session"));
+const subject_1 = __importDefault(require("../../models/subject"));
 const user_1 = __importDefault(require("../../models/user"));
 const typeDefs = apollo_server_1.gql `
   input sessionSubjectInput {
@@ -54,16 +55,30 @@ const resolvers = {
                     invalidArgs: args,
                 });
             }
-            session.individualSubjects.forEach((i) => {
+            session.individualSubjects.forEach((i) => __awaiter(void 0, void 0, void 0, function* () {
+                const dbSubject = yield subject_1.default.findOne({ name: i.name });
+                dbSubject.timePracticed += i.length;
+                yield dbSubject.save();
                 const subject = user.mySubjects.find((s) => s.subjectName === i.name);
-                // console.log(subject);
                 if (subject) {
                     subject.timePracticed += i.length;
                     user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
                 }
-            });
+                else {
+                    const newSubject = {
+                        subjectID: dbSubject.id,
+                        subjectName: i.name,
+                        timePracticed: i.length,
+                        subjectNotes: [],
+                    };
+                    user.mySubjects = [
+                        ...user.mySubjects,
+                        newSubject,
+                    ];
+                }
+            }));
             try {
-                user.save();
+                yield user.save();
             }
             catch (error) {
                 throw new apollo_server_1.UserInputError(error.message, {

@@ -16,9 +16,20 @@ const apollo_server_1 = require("apollo-server");
 const subject_1 = __importDefault(require("../../models/subject"));
 const user_1 = __importDefault(require("../../models/user"));
 const typeDefs = apollo_server_1.gql `
-  
+
+  input SubjectLinkInput {
+    url: String
+    description: String
+  }
+
   extend type Mutation {
-    addSubject(name: String!, description: String, userID: String): Subject
+    addSubject(
+      name: String!, 
+      description: String, 
+      userID: String, 
+      links: [SubjectLinkInput]
+    ): Subject
+    addLink(subjectID: String!, url: String!, description: String!): Subject
     deleteSubject(name: String!): Subject
   }
 `;
@@ -43,6 +54,26 @@ const resolvers = {
             try {
                 yield subject.save();
                 yield user.save();
+            }
+            catch (error) {
+                throw new apollo_server_1.UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return subject;
+        }),
+        addLink: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+            const subject = yield subject_1.default.findOne({ _id: args.subjectID });
+            const newLink = {
+                url: args.url,
+                description: args.description,
+            };
+            subject.links = [
+                ...subject.links,
+                newLink,
+            ];
+            try {
+                yield subject.save();
             }
             catch (error) {
                 throw new apollo_server_1.UserInputError(error.message, {

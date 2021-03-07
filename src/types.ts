@@ -20,10 +20,20 @@ export interface DBSessionType extends SessionType {
   id: string
 }
 
+export interface LinkType {
+  url: string
+  description: string
+}
+
 export interface SubjectType {
   name: string
   description?: string
   timePracticed: number
+  links: LinkType[]
+}
+
+export interface AddLinkType extends LinkType {
+  subjectID: string
 }
 
 export interface DBSubjectType extends SubjectType {

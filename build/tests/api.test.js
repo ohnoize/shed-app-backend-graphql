@@ -23,6 +23,8 @@ const utils_1 = require("./utils");
 const { query, mutate } = apollo_server_testing_1.createTestClient(index_1.server);
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
     let user;
+    let subject1;
+    let subject2;
     beforeEach(() => __awaiter(void 0, void 0, void 0, function* () {
         yield subject_1.default.deleteMany();
         yield user_1.default.deleteMany();
@@ -34,6 +36,20 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
             joined: new Date().toString(),
         });
         yield user.save();
+        subject1 = new subject_1.default({
+            name: 'chords',
+            description: 'chords for testing',
+            userID: user.id,
+            timePracticed: 0,
+        });
+        subject2 = new subject_1.default({
+            name: 'scales',
+            description: 'scales for testing',
+            userID: user.id,
+            timePracticed: 0,
+        });
+        yield subject1.save();
+        yield subject2.save();
     }));
     afterAll(() => __awaiter(void 0, void 0, void 0, function* () {
         yield mongoose_1.default.connection.close();
@@ -42,12 +58,13 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     test('Add subject', () => __awaiter(void 0, void 0, void 0, function* () {
         const mutateRes = yield mutate({
             mutation: utils_1.ADD_SUBJECT,
+            // eslint-disable-next-line no-underscore-dangle
             variables: { name: 'testSubject', description: 'subject for testing', userID: user.id },
         });
         const queryRes = yield query({
             query: utils_1.GET_SUBJECTS,
         });
-        expect(queryRes.data.allSubjects).toHaveLength(1);
+        expect(queryRes.data.allSubjects).toHaveLength(3);
         expect(mutateRes.data.addSubject.name).toEqual('testSubject');
     }));
     test('Add user', () => __awaiter(void 0, void 0, void 0, function* () {
@@ -70,14 +87,14 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         const usersRes = yield query({
             query: utils_1.ALL_USERS,
         });
-        yield mutate({
-            mutation: utils_1.ADD_SUBJECT,
-            variables: { name: 'chords', description: 'chords for testing', userID: user.id },
-        });
-        yield mutate({
-            mutation: utils_1.ADD_SUBJECT,
-            variables: { name: 'scales', description: 'scales for testing', userID: user.id },
-        });
+        // await mutate({
+        //   mutation: ADD_SUBJECT,
+        //   variables: { name: 'chords', description: 'chords for testing', userID: user.id },
+        // });
+        // await mutate({
+        //   mutation: ADD_SUBJECT,
+        //   variables: { name: 'scales', description: 'scales for testing', userID: user.id },
+        // });
         yield mutate({
             mutation: utils_1.ADD_SESSION,
             variables: {
@@ -106,6 +123,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
             mutation: utils_1.ADD_USER,
             variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' },
         });
+        // console.log(signUpRes.data.addUser);
         const loginRes = yield mutate({
             mutation: utils_1.LOGIN,
             variables: { username: 'testUser2', password: 'secret' },

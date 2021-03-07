@@ -50,5 +50,6 @@ const sessionSchema = new mongoose_1.default.Schema({
             length: Number,
         }],
 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 sessionSchema.plugin(mongoose_unique_validator_1.default);
 exports.default = mongoose_1.model('Session', sessionSchema);

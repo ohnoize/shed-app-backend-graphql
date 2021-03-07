@@ -38,6 +38,13 @@ const subjectSchema = new mongoose_1.default.Schema({
         type: Number,
         required: true,
     },
+    links: [
+        {
+            url: String,
+            description: String,
+        },
+    ],
 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 subjectSchema.plugin(mongoose_unique_validator_1.default);
 exports.default = mongoose_1.model('Subject', subjectSchema);

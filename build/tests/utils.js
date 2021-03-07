@@ -17,6 +17,7 @@ exports.GET_SUBJECTS = apollo_server_1.gql `
           id
           name
           description
+          timePracticed
         }
     }
 `;

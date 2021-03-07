@@ -75,6 +75,7 @@ const userSchema = new mongoose_1.default.Schema({
         },
     ],
 });
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 userSchema.plugin(mongoose_unique_validator_1.default);
 // const User = mongoose.model('User', userSchema);
 exports.default = mongoose_1.model('User', userSchema);
