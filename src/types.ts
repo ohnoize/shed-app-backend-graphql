@@ -96,7 +96,3 @@ export interface EditUserInput {
   id: string,
   subjectNotes: SubjectNotesInputExtra
 }
-
-export interface Context {
-  currentUser: UserBaseDocument
-}

@@ -27,7 +27,7 @@ const typeDefs = apollo_server_1.gql `
       name: String!, 
       description: String, 
       userID: String, 
-      links: [SubjectLinkInput]
+      links: SubjectLinkInput
     ): Subject
     addLink(subjectID: String!, url: String!, description: String!): Subject
     deleteSubject(name: String!): Subject
@@ -36,7 +36,10 @@ const typeDefs = apollo_server_1.gql `
 const resolvers = {
     Mutation: {
         // eslint-disable-next-line max-len
-        addSubject: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+        addSubject: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('You have to be signed in to add subjects!');
+            }
             const subject = new subject_1.default(Object.assign({}, args));
             subject.timePracticed = 0;
             const user = yield user_1.default.findOne({ _id: args.userID });

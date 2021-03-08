@@ -41,7 +41,11 @@ const typeDefs = apollo_server_1.gql `
 `;
 const resolvers = {
     Mutation: {
-        addSession: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+        // eslint-disable-next-line max-len
+        addSession: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('Not authenticated!');
+            }
             const user = yield user_1.default.findOne({ _id: args.userID });
             const session = new session_1.default(Object.assign(Object.assign({}, args), { user: user.id }));
             session.date = new Date().toString();

@@ -41,7 +41,7 @@ const typeDefs = apollo_server_1.gql `
   extend type Query {
     allUsers: [User]
     userCount: Int
-    findUser(id: Int): User
+    findUser(id: String): User
     me: User
   }
 `;
@@ -53,9 +53,21 @@ const resolvers = {
         }),
     },
     Query: {
-        allUsers: () => user_1.default.find({}),
+        allUsers: (_root, _args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('Not authenticated');
+            }
+            const user = yield user_1.default.find({});
+            return user;
+        }),
         userCount: () => user_1.default.collection.countDocuments(),
-        findUser: (_root, args) => user_1.default.findOne({ id: args.id }),
+        findUser: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('Not authenticated');
+            }
+            const user = yield user_1.default.findOne({ _id: args.id });
+            return user;
+        }),
         me: (_root, _args, context) => context.currentUser,
     },
 };

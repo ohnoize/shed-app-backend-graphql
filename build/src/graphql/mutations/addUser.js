@@ -64,7 +64,7 @@ const resolvers = {
                 username: user.username,
                 id: user.id,
             };
-            const token = jsonwebtoken_1.default.sign(userForToken, config_1.default.SECRET_KEY);
+            const token = jsonwebtoken_1.default.sign(userForToken, config_1.default.SECRET_KEY, { expiresIn: '24h' });
             return { token, user };
         }),
         editUser: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {

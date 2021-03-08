@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.server = void 0;
+exports.server = exports.schema = void 0;
 /* eslint-disable no-console */
 const apollo_server_1 = require("apollo-server");
 const mongoose_1 = __importDefault(require("mongoose"));
@@ -30,9 +30,9 @@ mongoose_1.default.connect(config_1.default.MONGODB_URI, {
     .catch((error) => {
     console.log('Error connecting to MongoDB:', error.message);
 });
-const schema = schema_1.default();
+exports.schema = schema_1.default();
 exports.server = new apollo_server_1.ApolloServer({
-    schema,
+    schema: exports.schema,
     introspection: true,
     playground: true,
     context: ({ req }) => __awaiter(void 0, void 0, void 0, function* () {
