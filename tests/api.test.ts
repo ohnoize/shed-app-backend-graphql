@@ -1,6 +1,7 @@
+import { ApolloServer } from 'apollo-server';
 import { createTestClient } from 'apollo-server-testing';
 import mongoose from 'mongoose';
-import { server } from '../src/index';
+import { schema } from '../src/index';
 import Session from '../src/models/session';
 import Subject, { SubjectBaseDocument } from '../src/models/subject';
 import User, { UserBaseDocument } from '../src/models/user';
@@ -14,8 +15,23 @@ import {
   LOGIN,
 } from './utils';
 
+const testServer = new ApolloServer({
+  schema,
+  introspection: true,
+  playground: true,
+  context: () => {
+    const currentUser: UserBaseDocument = new User({
+      username: 'contextUser',
+      passwordHash: 'contextHash',
+      instrument: 'context',
+      joined: new Date().toString(),
+    });
+    return { currentUser };
+  },
+});
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const { query, mutate } = createTestClient(server as any);
+const { query, mutate } = createTestClient(testServer as any);
 
 describe('Adding subjects, users, and sessions, able to create user and login, random text here', () => {
   let user: UserBaseDocument;

@@ -20,7 +20,7 @@ mongoose.connect(config.MONGODB_URI, {
     console.log('Error connecting to MongoDB:', error.message);
   });
 
-const schema = createSchema();
+export const schema = createSchema();
 
 export const server = new ApolloServer({
   schema,
