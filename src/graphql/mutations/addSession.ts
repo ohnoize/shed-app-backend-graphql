@@ -1,9 +1,9 @@
-import { gql, UserInputError } from 'apollo-server';
+import { AuthenticationError, gql, UserInputError } from 'apollo-server';
 import Session, { SessionBaseDocument } from '../../models/session';
 import Subject from '../../models/subject';
 import User from '../../models/user';
 // eslint-disable-next-line import/no-cycle
-import { ResolverMap } from '../schema';
+import { Context, ResolverMap } from '../schema';
 import { DBSessionType, MySubjectType, SessionInput } from '../../types';
 
 const typeDefs = gql`
@@ -36,7 +36,11 @@ interface Resolvers {
 
 const resolvers: Resolvers = {
   Mutation: {
-    addSession: async (_root: DBSessionType, args: SessionInput): Promise<SessionBaseDocument> => {
+    // eslint-disable-next-line max-len
+    addSession: async (_root: DBSessionType, args: SessionInput, context: Context): Promise<SessionBaseDocument> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('Not authenticated!');
+      }
       const user = await User.findOne({ _id: args.userID });
       const session = new Session({ ...args, user: user.id });
       session.date = new Date().toString();

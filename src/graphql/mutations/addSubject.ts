@@ -1,11 +1,11 @@
-import { gql, UserInputError } from 'apollo-server';
+import { AuthenticationError, gql, UserInputError } from 'apollo-server';
 import Subject, { SubjectBaseDocument } from '../../models/subject';
 import User from '../../models/user';
 import {
   AddLinkType, AddSubjectType, DBSubjectType, MySubjectType,
 } from '../../types';
 // eslint-disable-next-line import/no-cycle
-import { ResolverMap } from '../schema';
+import { Context, ResolverMap } from '../schema';
 
 const typeDefs = gql`
 
@@ -19,7 +19,7 @@ const typeDefs = gql`
       name: String!, 
       description: String, 
       userID: String, 
-      links: [SubjectLinkInput]
+      links: SubjectLinkInput
     ): Subject
     addLink(subjectID: String!, url: String!, description: String!): Subject
     deleteSubject(name: String!): Subject
@@ -33,7 +33,10 @@ interface Resolvers {
 const resolvers: Resolvers = {
   Mutation: {
     // eslint-disable-next-line max-len
-    addSubject: async (_root: DBSubjectType, args: AddSubjectType): Promise<SubjectBaseDocument> => {
+    addSubject: async (_root: DBSubjectType, args: AddSubjectType, context: Context): Promise<SubjectBaseDocument> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('You have to be signed in to add subjects!');
+      }
       const subject = new Subject({ ...args });
       subject.timePracticed = 0;
       const user = await User.findOne({ _id: args.userID });

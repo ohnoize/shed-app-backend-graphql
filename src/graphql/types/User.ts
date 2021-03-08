@@ -1,8 +1,8 @@
-import { gql } from 'apollo-server';
+import { AuthenticationError, gql } from 'apollo-server';
 // eslint-disable-next-line import/no-cycle
-import { ResolverMap } from '../schema';
+import { Context, ResolverMap } from '../schema';
 import Session, { SessionBaseDocument } from '../../models/session';
-import User from '../../models/user';
+import User, { UserBaseDocument } from '../../models/user';
 import { DBUserType } from '../../types';
 
 const typeDefs = gql`
@@ -31,7 +31,7 @@ const typeDefs = gql`
   extend type Query {
     allUsers: [User]
     userCount: Int
-    findUser(id: Int): User
+    findUser(id: String): User
     me: User
   }
 `;
@@ -48,9 +48,23 @@ const resolvers: Resolvers = {
     },
   },
   Query: {
-    allUsers: () => User.find({}),
+    allUsers: async (_root: DBUserType,
+      _args: void, context: Context): Promise<UserBaseDocument[]> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('Not authenticated');
+      }
+      const user = await User.find({});
+      return user;
+    },
     userCount: () => User.collection.countDocuments(),
-    findUser: (_root, args: { id: string }) => User.findOne({ id: args.id }),
+    findUser: async (_root: DBUserType,
+      args: { id: string }, context: Context): Promise<UserBaseDocument> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('Not authenticated');
+      }
+      const user = await User.findOne({ _id: args.id });
+      return user;
+    },
     me: (_root, _args, context) => context.currentUser,
   },
 };

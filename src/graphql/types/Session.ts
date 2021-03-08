@@ -1,10 +1,10 @@
-import { gql } from 'apollo-server';
+import { AuthenticationError, gql } from 'apollo-server';
 import Session, { SessionBaseDocument } from '../../models/session';
 import User, { UserBaseDocument } from '../../models/user';
 import { DBUserType, DBSessionType } from '../../types';
 
 // eslint-disable-next-line import/no-cycle
-import { ResolverMap } from '../schema';
+import { Context, ResolverMap } from '../schema';
 
 const typeDefs = gql`
   type SessionSubject {
@@ -48,7 +48,10 @@ const resolvers: Resolvers = {
   },
   Query: {
     // eslint-disable-next-line max-len
-    allSessions: async (_root:DBSessionType, args: { userID: string }): Promise<SessionBaseDocument[]> => {
+    allSessions: async (_root:DBSessionType, args: { userID: string }, context: Context): Promise<SessionBaseDocument[]> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('Not authenticated');
+      }
       if (args.userID) {
         const sessions = await Session.find({});
         return sessions.filter(s => s.userID === args.userID);
