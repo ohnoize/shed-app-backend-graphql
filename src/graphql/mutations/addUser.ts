@@ -67,7 +67,7 @@ const resolvers: Resolvers = {
         username: user.username,
         id: user.id,
       };
-      const token = jwt.sign(userForToken, config.SECRET_KEY);
+      const token = jwt.sign(userForToken, config.SECRET_KEY, { expiresIn: '24h' });
 
       return { token, user };
     },
