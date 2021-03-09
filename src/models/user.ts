@@ -21,6 +21,34 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
     type: String,
     required: false,
   },
+  timePracticed: {
+    type: Number,
+    required: true,
+  },
+  goals: [
+    {
+      description: {
+        type: String,
+        required: true,
+      },
+      subject: {
+        type: String,
+        required: true,
+      },
+      targetTime: {
+        type: Number,
+        required: true,
+      },
+      deadline: {
+        type: String,
+        required: true,
+      },
+      passed: {
+        type: Boolean,
+        required: true,
+      },
+    },
+  ],
   mySubjects: [
     {
       subjectID: {

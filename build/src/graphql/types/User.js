@@ -20,6 +20,13 @@ const typeDefs = apollo_server_1.gql `
     date: String!
     notes: String!
   }
+  type Goal {
+    description: String!,
+    subject: String!,
+    targetTime: Int!,
+    deadline: String!,
+    passed: Boolean!
+  }
   type MySubject {
     subjectID: String!
     subjectName: String!
@@ -29,6 +36,8 @@ const typeDefs = apollo_server_1.gql `
   type User {
     id: ID!
     username: String!
+    timePracticed: Int!
+    goals: [Goal]
     instrument: String
     mySubjects: [MySubject]
     joined: String!

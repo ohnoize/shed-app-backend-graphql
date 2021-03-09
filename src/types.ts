@@ -51,12 +51,22 @@ export interface MySubjectType {
   subjectNotes: SubjectNotesType[],
 }
 
+export interface GoalType {
+  description: string,
+  subject: string,
+  targetTime: number,
+  deadline: string,
+  passed: boolean
+}
+
 export interface UserType {
   username: string,
   joined: string,
+  timePracticed: number,
   instrument?: string,
   sessions: SessionType[],
-  mySubjects: MySubjectType[]
+  mySubjects: MySubjectType[],
+  goals: GoalType[]
 }
 
 export interface AddUserType {

@@ -47,6 +47,7 @@ const resolvers: Resolvers = {
       try {
         await session.save();
         user.sessions = user.sessions.concat(session.id);
+        user.timePracticed += session.totalLength;
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {

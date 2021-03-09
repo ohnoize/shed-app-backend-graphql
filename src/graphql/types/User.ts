@@ -10,6 +10,13 @@ const typeDefs = gql`
     date: String!
     notes: String!
   }
+  type Goal {
+    description: String!,
+    subject: String!,
+    targetTime: Int!,
+    deadline: String!,
+    passed: Boolean!
+  }
   type MySubject {
     subjectID: String!
     subjectName: String!
@@ -19,6 +26,8 @@ const typeDefs = gql`
   type User {
     id: ID!
     username: String!
+    timePracticed: Int!
+    goals: [Goal]
     instrument: String
     mySubjects: [MySubject]
     joined: String!

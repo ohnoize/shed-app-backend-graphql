@@ -42,6 +42,7 @@ const resolvers: Resolvers = {
         username: args.username,
         instrument: args.instrument,
         joined: new Date().toString(),
+        timePracticed: 0,
         passwordHash,
       });
       try {

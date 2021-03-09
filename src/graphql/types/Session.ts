@@ -43,6 +43,8 @@ const resolvers: Resolvers = {
         instrument: user.instrument,
         sessions: user.sessions,
         mySubjects: user.mySubjects,
+        goals: user.goals,
+        timePracticed: user.timePracticed,
       };
     },
   },
