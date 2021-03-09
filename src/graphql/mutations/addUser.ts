@@ -1,11 +1,11 @@
-import { gql, UserInputError } from 'apollo-server';
+import { AuthenticationError, gql, UserInputError } from 'apollo-server';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User, { UserBaseDocument } from '../../models/user';
 import Subject from '../../models/subject';
 import config from '../../utils/config';
 // eslint-disable-next-line import/no-cycle
-import { ResolverMap } from '../schema';
+import { Context, ResolverMap } from '../schema';
 import {
   AddUserType,
   EditUserInput,
@@ -13,6 +13,7 @@ import {
   LoginType,
   DBUserType,
   MySubjectType,
+  AddGoalType,
 } from '../../types';
 
 const typeDefs = gql`
@@ -20,10 +21,17 @@ const typeDefs = gql`
     subjectID: String
     notes: String
   }
+  input goalInput {
+    description: String!,
+    subject: String!,
+    targetTime: Int!,
+    deadline: String,
+  }
   extend type Mutation {
     addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
+    addGoal(id: String!, goal: goalInput!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
   }
@@ -72,7 +80,14 @@ const resolvers: Resolvers = {
 
       return { token, user };
     },
-    editUser: async (_root: DBUserType, args: EditUserInput): Promise<UserBaseDocument> => {
+    editUser: async (
+      _root: DBUserType,
+      args: EditUserInput,
+      context: Context,
+    ): Promise<UserBaseDocument> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('You have to be signed in to add subjects!');
+      }
       const user = await User.findOne({ _id: args.id });
       // console.log('args:', args);
       if (!user) return null;
@@ -97,6 +112,33 @@ const resolvers: Resolvers = {
           newSubject,
         ];
       }
+      try {
+        await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
+      return user;
+    },
+    addGoal: async (
+      _root: DBUserType,
+      args: AddGoalType,
+      context: Context,
+    ): Promise<UserBaseDocument> => {
+      if (!context.currentUser) {
+        throw new AuthenticationError('You have to be signed in to add subjects!');
+      }
+      const user = await User.findOne({ _id: args.id });
+      if (!user) return null;
+      const newGoal = {
+        ...args.goal,
+        passed: false,
+      };
+      user.goals = [
+        ...user.goals,
+        newGoal,
+      ];
       try {
         await user.save();
       } catch (error) {

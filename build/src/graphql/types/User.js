@@ -24,7 +24,7 @@ const typeDefs = apollo_server_1.gql `
     description: String!,
     subject: String!,
     targetTime: Int!,
-    deadline: String!,
+    deadline: String,
     passed: Boolean!
   }
   type MySubject {

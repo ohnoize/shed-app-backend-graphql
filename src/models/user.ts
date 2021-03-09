@@ -41,7 +41,6 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
       },
       deadline: {
         type: String,
-        required: true,
       },
       passed: {
         type: Boolean,

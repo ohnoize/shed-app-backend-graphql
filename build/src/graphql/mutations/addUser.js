@@ -23,10 +23,17 @@ const typeDefs = apollo_server_1.gql `
     subjectID: String
     notes: String
   }
+  input goalInput {
+    description: String!,
+    subject: String!,
+    targetTime: Int!,
+    deadline: String,
+  }
   extend type Mutation {
     addUser(username: String!, instrument: String, password: String!): User
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
+    addGoal(id: String!, goal: goalInput!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
   }
@@ -40,6 +47,7 @@ const resolvers = {
                 username: args.username,
                 instrument: args.instrument,
                 joined: new Date().toString(),
+                timePracticed: 0,
                 passwordHash,
             });
             try {
@@ -67,7 +75,10 @@ const resolvers = {
             const token = jsonwebtoken_1.default.sign(userForToken, config_1.default.SECRET_KEY, { expiresIn: '24h' });
             return { token, user };
         }),
-        editUser: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+        editUser: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('You have to be signed in to add subjects!');
+            }
             const user = yield user_1.default.findOne({ _id: args.id });
             // console.log('args:', args);
             if (!user)
@@ -94,6 +105,28 @@ const resolvers = {
                     newSubject,
                 ];
             }
+            try {
+                yield user.save();
+            }
+            catch (error) {
+                throw new apollo_server_1.UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return user;
+        }),
+        addGoal: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
+            if (!context.currentUser) {
+                throw new apollo_server_1.AuthenticationError('You have to be signed in to add subjects!');
+            }
+            const user = yield user_1.default.findOne({ _id: args.id });
+            if (!user)
+                return null;
+            const newGoal = Object.assign(Object.assign({}, args.goal), { passed: false });
+            user.goals = [
+                ...user.goals,
+                newGoal,
+            ];
             try {
                 yield user.save();
             }

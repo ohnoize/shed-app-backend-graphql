@@ -48,6 +48,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
             username: 'testUser',
             passwordHash: 'asfasfasf',
             instrument: 'theremin',
+            timePracticed: 0,
             joined: new Date().toString(),
         });
         yield user.save();

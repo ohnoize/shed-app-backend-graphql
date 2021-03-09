@@ -59,7 +59,6 @@ const userSchema = new mongoose_1.default.Schema({
             },
             deadline: {
                 type: String,
-                required: true,
             },
             passed: {
                 type: Boolean,

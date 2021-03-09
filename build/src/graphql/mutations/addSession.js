@@ -52,6 +52,7 @@ const resolvers = {
             try {
                 yield session.save();
                 user.sessions = user.sessions.concat(session.id);
+                user.timePracticed += session.totalLength;
                 yield user.save();
             }
             catch (error) {
@@ -62,11 +63,19 @@ const resolvers = {
             session.individualSubjects.forEach((i) => __awaiter(void 0, void 0, void 0, function* () {
                 const dbSubject = yield subject_1.default.findOne({ name: i.name });
                 dbSubject.timePracticed += i.length;
-                yield dbSubject.save();
+                try {
+                    yield dbSubject.save();
+                }
+                catch (e) {
+                    throw new apollo_server_1.UserInputError(e.message, {
+                        invalidArgs: args,
+                    });
+                }
                 const subject = user.mySubjects.find((s) => s.subjectName === i.name);
                 if (subject) {
                     subject.timePracticed += i.length;
                     user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
+                    yield user.save();
                 }
                 else {
                     const newSubject = {
@@ -79,6 +88,7 @@ const resolvers = {
                         ...user.mySubjects,
                         newSubject,
                     ];
+                    yield user.save();
                 }
             }));
             try {

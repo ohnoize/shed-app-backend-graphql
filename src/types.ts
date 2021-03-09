@@ -55,8 +55,13 @@ export interface GoalType {
   description: string,
   subject: string,
   targetTime: number,
-  deadline: string,
+  deadline?: string,
   passed: boolean
+}
+
+export interface AddGoalType {
+  goal: GoalType
+  id: string
 }
 
 export interface UserType {

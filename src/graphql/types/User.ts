@@ -14,7 +14,7 @@ const typeDefs = gql`
     description: String!,
     subject: String!,
     targetTime: Int!,
-    deadline: String!,
+    deadline: String,
     passed: Boolean!
   }
   type MySubject {
