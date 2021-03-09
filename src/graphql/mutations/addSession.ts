@@ -57,11 +57,18 @@ const resolvers: Resolvers = {
       session.individualSubjects.forEach(async (i) => {
         const dbSubject = await Subject.findOne({ name: i.name });
         dbSubject.timePracticed += i.length;
-        await dbSubject.save();
+        try {
+          await dbSubject.save();
+        } catch (e) {
+          throw new UserInputError(e.message, {
+            invalidArgs: args,
+          });
+        }
         const subject = user.mySubjects.find((s) => s.subjectName === i.name);
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
+          await user.save();
         } else {
           const newSubject: MySubjectType = {
             subjectID: dbSubject.id,
@@ -73,6 +80,7 @@ const resolvers: Resolvers = {
             ...user.mySubjects,
             newSubject,
           ];
+          await user.save();
         }
       });
       try {
