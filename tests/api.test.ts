@@ -116,7 +116,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     //   mutation: ADD_SUBJECT,
     //   variables: { name: 'scales', description: 'scales for testing', userID: user.id },
     // });
-    await mutate({
+    const sessionRes = await mutate({
       mutation: ADD_SESSION,
       variables: {
         totalLength: 1200,
@@ -134,6 +134,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         ],
       },
     });
+    console.log(sessionRes.data.addSession);
     const queryRes = await query({
       query: GET_SESSIONS,
     });
@@ -145,15 +146,16 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
       mutation: ADD_USER,
       variables: { username: 'testUser2', password: 'secret', instrument: 'balalaika' },
     });
+
     // console.log(signUpRes.data.addUser);
     const loginRes = await mutate({
       mutation: LOGIN,
       variables: { username: 'testUser2', password: 'secret' },
     });
+
     const usersRes = await query({
       query: ALL_USERS,
     });
-
     expect(signUpRes.data.addUser).toHaveProperty('id');
     expect(loginRes.data.login).toHaveProperty('token');
     expect(usersRes.data.allUsers[1].username).toEqual('testUser2');

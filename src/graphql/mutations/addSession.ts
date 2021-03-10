@@ -44,17 +44,17 @@ const resolvers: Resolvers = {
       const user = await User.findOne({ _id: args.userID });
       const session = new Session({ ...args, user: user.id });
       session.date = new Date().toString();
+      user.sessions = user.sessions.concat(session.id);
+      user.timePracticed += session.totalLength;
       try {
         await session.save();
-        user.sessions = user.sessions.concat(session.id);
-        user.timePracticed += session.totalLength;
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
         });
       }
-      session.individualSubjects.forEach(async (i) => {
+      await Promise.all(session.individualSubjects.map(async (i) => {
         const dbSubject = await Subject.findOne({ name: i.name });
         dbSubject.timePracticed += i.length;
         try {
@@ -94,7 +94,7 @@ const resolvers: Resolvers = {
             });
           }
         }
-      });
+      }));
       return session;
     },
     deleteSession: async (_root, args) => Session.findByIdAndDelete(args.id),
