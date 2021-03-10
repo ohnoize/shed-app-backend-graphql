@@ -68,7 +68,13 @@ const resolvers: Resolvers = {
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
-          await user.save();
+          try {
+            await user.save();
+          } catch (error) {
+            throw new UserInputError(error.message, {
+              invalidArgs: args,
+            });
+          }
         } else {
           const newSubject: MySubjectType = {
             subjectID: dbSubject.id,
@@ -80,16 +86,15 @@ const resolvers: Resolvers = {
             ...user.mySubjects,
             newSubject,
           ];
-          await user.save();
+          try {
+            await user.save();
+          } catch (error) {
+            throw new UserInputError(error.message, {
+              invalidArgs: args,
+            });
+          }
         }
       });
-      try {
-        await user.save();
-      } catch (error) {
-        throw new UserInputError(error.message, {
-          invalidArgs: args,
-        });
-      }
       return session;
     },
     deleteSession: async (_root, args) => Session.findByIdAndDelete(args.id),
