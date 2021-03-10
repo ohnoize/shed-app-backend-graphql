@@ -11,8 +11,10 @@ const typeDefs = gql`
     notes: String!
   }
   type Goal {
+    id: ID!,
     description: String!,
     subject: String!,
+    elapsedTime: Int!,
     targetTime: Int!,
     deadline: String,
     passed: Boolean!

@@ -55,8 +55,14 @@ export interface GoalType {
   description: string,
   subject: string,
   targetTime: number,
+  elapsedTime: number,
   deadline?: string,
   passed: boolean
+  id: string
+}
+
+export interface DBGoalType extends GoalType {
+  id: string
 }
 
 export interface AddGoalType {
@@ -85,8 +91,9 @@ export interface LoginType {
   password: string
 }
 
-export interface DBUserType extends UserType {
+export interface DBUserType extends Omit<UserType, 'goals'> {
   id: string
+  goals: DBGoalType[]
 }
 
 export interface TokenUserType {
@@ -110,4 +117,9 @@ export type SessionInput = Omit<SessionType, 'date'>;
 export interface EditUserInput {
   id: string,
   subjectNotes: SubjectNotesInputExtra
+}
+
+export interface DeleteGoalType {
+  userID: string,
+  goalID: string,
 }

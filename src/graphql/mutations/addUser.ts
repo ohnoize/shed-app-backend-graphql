@@ -14,6 +14,7 @@ import {
   DBUserType,
   MySubjectType,
   AddGoalType,
+  DeleteGoalType,
 } from '../../types';
 
 const typeDefs = gql`
@@ -32,6 +33,7 @@ const typeDefs = gql`
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
     addGoal(id: String!, goal: goalInput!): User
+    deleteGoal(userID: String!, goalID: String!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
   }
@@ -133,6 +135,7 @@ const resolvers: Resolvers = {
       if (!user) return null;
       const newGoal = {
         ...args.goal,
+        elapsedTime: 0,
         passed: false,
       };
       user.goals = [
@@ -143,6 +146,21 @@ const resolvers: Resolvers = {
         await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
+      return user;
+    },
+    deleteGoal: async (_root: DBUserType, args: DeleteGoalType): Promise<UserBaseDocument> => {
+      const user = await User.findOne({ _id: args.userID });
+      if (!user) return null;
+      const goalToDelete = user.goals.find((g) => g.id === args.goalID);
+      if (!goalToDelete) return null;
+      user.goals = user.goals.map((g) => (g.id === args.goalID ? null : g));
+      try {
+        await user.save();
+      } catch (e) {
+        throw new UserInputError(e.message, {
           invalidArgs: args,
         });
       }

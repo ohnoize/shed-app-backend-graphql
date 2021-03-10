@@ -116,7 +116,7 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
     //   mutation: ADD_SUBJECT,
     //   variables: { name: 'scales', description: 'scales for testing', userID: user.id },
     // });
-    const sessionRes = await mutate({
+    await mutate({
       mutation: ADD_SESSION,
       variables: {
         totalLength: 1200,
@@ -134,7 +134,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
         ],
       },
     });
-    console.log(sessionRes.data.addSession);
     const queryRes = await query({
       query: GET_SESSIONS,
     });

@@ -35,6 +35,10 @@ const userSchema = new mongoose.Schema<UserBaseDocument>({
         type: String,
         required: true,
       },
+      elapsedTime: {
+        type: Number,
+        required: true,
+      },
       targetTime: {
         type: Number,
         required: true,
