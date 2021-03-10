@@ -48,7 +48,6 @@ const resolvers: Resolvers = {
       user.timePracticed += session.totalLength;
       try {
         await session.save();
-        await user.save();
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
@@ -64,17 +63,14 @@ const resolvers: Resolvers = {
             invalidArgs: args,
           });
         }
+        const goal = user.goals.find((g) => g.subject === i.name);
+        if (goal) {
+          goal.elapsedTime += i.length;
+        }
         const subject = user.mySubjects.find((s) => s.subjectName === i.name);
         if (subject) {
           subject.timePracticed += i.length;
           user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
-          try {
-            await user.save();
-          } catch (error) {
-            throw new UserInputError(error.message, {
-              invalidArgs: args,
-            });
-          }
         } else {
           const newSubject: MySubjectType = {
             subjectID: dbSubject.id,
@@ -86,15 +82,15 @@ const resolvers: Resolvers = {
             ...user.mySubjects,
             newSubject,
           ];
-          try {
-            await user.save();
-          } catch (error) {
-            throw new UserInputError(error.message, {
-              invalidArgs: args,
-            });
-          }
         }
       }));
+      try {
+        await user.save();
+      } catch (error) {
+        throw new UserInputError(error.message, {
+          invalidArgs: args,
+        });
+      }
       return session;
     },
     deleteSession: async (_root, args) => Session.findByIdAndDelete(args.id),
