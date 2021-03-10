@@ -156,7 +156,7 @@ const resolvers: Resolvers = {
       if (!user) return null;
       const goalToDelete = user.goals.find((g) => g.id === args.goalID);
       if (!goalToDelete) return null;
-      user.goals = user.goals.map((g) => (g.id === args.goalID ? null : g));
+      user.goals = user.goals.filter((g) => g.id !== args.goalID);
       try {
         await user.save();
       } catch (e) {
