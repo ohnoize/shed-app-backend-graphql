@@ -1,5 +1,7 @@
 /* eslint-disable no-console */
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
+import express from 'express';
+import cors from 'cors';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import createSchema from './graphql/schema';
@@ -40,7 +42,11 @@ export const server = new ApolloServer({
   },
 });
 
-server.listen({ port: process.env.PORT || config.PORT }).then(({ url }) => {
+const app = express();
+app.use(cors());
+server.applyMiddleware({ app });
+
+app.listen({ port: process.env.PORT || config.PORT }, () => {
   // eslint-disable-next-line no-console
-  console.log(`Server ready at ${url}`);
+  console.log(`Server ready at ${server.graphqlPath}`);
 });
