@@ -13,6 +13,8 @@ import {
   MySubjectType,
   AddGoalType,
   DeleteGoalType,
+  EditGoalType,
+  DBGoalType,
 } from '../../types';
 import { createNewToken, createRefreshToken } from '../../auth';
 import { sendRefreshToken } from '../../sendRefreshToken';
@@ -33,6 +35,7 @@ const typeDefs = gql`
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
     addGoal(id: String!, goal: goalInput!): User
+    editGoal(userID: String!, goalID: String!, time: Int!): Goal
     deleteGoal(userID: String!, goalID: String!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
@@ -157,6 +160,22 @@ const resolvers: Resolvers = {
         });
       }
       return user;
+    },
+    editGoal: async (_root: DBUserType, args: EditGoalType): Promise<DBGoalType> => {
+      const user = await User.findOne({ _id: args.userID });
+      if (!user) return null;
+      const goalToEdit = user.goals.find((g) => g.id === args.goalID);
+      if (!goalToEdit) return null;
+      goalToEdit.elapsedTime += args.time;
+      user.goals = user.goals.map((g) => (g.id !== args.goalID ? g : goalToEdit));
+      try {
+        await user.save();
+      } catch (e) {
+        throw new UserInputError(e.message, {
+          invalidArgs: args,
+        });
+      }
+      return goalToEdit;
     },
     deleteGoal: async (_root: DBUserType, args: DeleteGoalType): Promise<UserBaseDocument> => {
       const user = await User.findOne({ _id: args.userID });

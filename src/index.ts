@@ -14,36 +14,6 @@ import { sendRefreshToken } from './sendRefreshToken';
 
 console.log('Connectingg to', config.MONGODB_URI);
 
-mongoose.connect(config.MONGODB_URI, {
-  useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true,
-})
-  .then(() => {
-    console.log('Connected to MongoDB');
-  })
-  .catch((error) => {
-    console.log('Error connecting to MongoDB:', error.message);
-  });
-
-export const schema = createSchema();
-
-const server = new ApolloServer({
-  schema,
-  introspection: true,
-  playground: true,
-  context: async ({ req, res }) => {
-    const auth = req ? req.headers.authorization : null;
-    if (auth && auth.toLowerCase().startsWith('bearer ')) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const decodedToken: TokenUserType = <any>jwt.verify(
-        auth.substring(7), config.SECRET_KEY,
-      );
-      const currentUser: UserBaseDocument = await User.findOne({ _id: decodedToken.id });
-      return { currentUser, res, req };
-    }
-    return { res, req };
-  },
-});
-
 const app = express();
 
 app.use(cors({
@@ -52,7 +22,6 @@ app.use(cors({
 }));
 
 app.use(cookieParser());
-server.applyMiddleware({ app });
 
 app.get('/', (_req, res) => res.send('Yello!'));
 
@@ -83,14 +52,42 @@ app.post('/refresh_token', async (req, res) => {
     id: user.id,
   };
 
-  res.cookie('saID', createRefreshToken(userForRefreshToken), {
-    httpOnly: true,
-  });
-
   sendRefreshToken(res, createRefreshToken(userForRefreshToken));
 
   return res.send({ success: true, token: createNewToken(userForToken) });
 });
+
+mongoose.connect(config.MONGODB_URI, {
+  useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true,
+})
+  .then(() => {
+    console.log('Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.log('Error connecting to MongoDB:', error.message);
+  });
+
+export const schema = createSchema();
+
+const server = new ApolloServer({
+  schema,
+  introspection: true,
+  playground: true,
+  context: async ({ req, res }) => {
+    const auth = req ? req.headers.authorization : null;
+    if (auth && auth.toLowerCase().startsWith('bearer ')) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const decodedToken: TokenUserType = <any>jwt.verify(
+        auth.substring(7), config.SECRET_KEY,
+      );
+      const currentUser: UserBaseDocument = await User.findOne({ _id: decodedToken.id });
+      return { currentUser, res, req };
+    }
+    return { res, req };
+  },
+});
+
+server.applyMiddleware({ app, cors: false });
 
 app.listen({ port: process.env.PORT || config.PORT }, () => {
   // eslint-disable-next-line no-console

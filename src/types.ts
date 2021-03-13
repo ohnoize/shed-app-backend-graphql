@@ -70,6 +70,12 @@ export interface AddGoalType {
   id: string
 }
 
+export interface EditGoalType {
+  userID: string
+  time: number
+  goalID: string
+}
+
 export interface UserType {
   username: string,
   joined: string,
