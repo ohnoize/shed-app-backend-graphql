@@ -1,4 +1,4 @@
-import { ApolloServer } from 'apollo-server';
+import { ApolloServer } from 'apollo-server-express';
 import { createTestClient } from 'apollo-server-testing';
 import mongoose from 'mongoose';
 import { schema } from '../src/index';
@@ -19,14 +19,14 @@ const testServer = new ApolloServer({
   schema,
   introspection: true,
   playground: true,
-  context: () => {
+  context: ({ req, res }) => {
     const currentUser: UserBaseDocument = new User({
       username: 'contextUser',
       passwordHash: 'contextHash',
       instrument: 'context',
       joined: new Date().toString(),
     });
-    return { currentUser };
+    return { currentUser, req, res };
   },
 });
 
