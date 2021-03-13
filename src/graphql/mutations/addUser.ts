@@ -39,6 +39,7 @@ const typeDefs = gql`
     deleteGoal(userID: String!, goalID: String!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
+    logOut: Boolean!
   }
 `;
 
@@ -167,6 +168,9 @@ const resolvers: Resolvers = {
       const goalToEdit = user.goals.find((g) => g.id === args.goalID);
       if (!goalToEdit) return null;
       goalToEdit.elapsedTime += args.time;
+      if (goalToEdit.elapsedTime >= goalToEdit.targetTime) {
+        goalToEdit.passed = true;
+      }
       user.goals = user.goals.map((g) => (g.id !== args.goalID ? g : goalToEdit));
       try {
         await user.save();
@@ -194,6 +198,10 @@ const resolvers: Resolvers = {
     },
     deleteUser: async (_root, args) => User.findByIdAndDelete(args.id),
     deleteUserByName: async (_root, args) => User.findOneAndDelete({ username: args.username }),
+    logOut: async (_root: DBUserType, _args: void, { res }: Context): Promise<boolean> => {
+      sendRefreshToken(res, '');
+      return true;
+    },
   },
 };
 

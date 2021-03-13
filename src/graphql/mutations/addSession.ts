@@ -63,10 +63,10 @@ const resolvers: Resolvers = {
             invalidArgs: args,
           });
         }
-        const goal = user.goals.find((g) => g.subject === i.name);
-        if (goal) {
-          goal.elapsedTime += i.length;
-        }
+        // const goal = user.goals.find((g) => g.subject === i.name);
+        // if (goal) {
+        //   goal.elapsedTime += i.length;
+        // }
         const subject = user.mySubjects.find((s) => s.subjectName === i.name);
         if (subject) {
           subject.timePracticed += i.length;

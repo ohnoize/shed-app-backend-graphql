@@ -16,10 +16,12 @@ console.log('Connectingg to', config.MONGODB_URI);
 
 const app = express();
 
-app.use(cors({
-  origin: 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: config.APP_URI,
+    credentials: true,
+  }),
+);
 
 app.use(cookieParser());
 
