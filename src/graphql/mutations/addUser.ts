@@ -79,12 +79,13 @@ const resolvers: Resolvers = {
         id: user.id,
       };
 
-      const userForRefreshToken = {
-        id: user.id,
-      };
+      if (!(process.env.NODE_ENV === 'test')) {
+        const userForRefreshToken = {
+          id: user.id,
+        };
+        sendRefreshToken(res, createRefreshToken(userForRefreshToken));
+      }
       const token = createNewToken(userForToken);
-
-      sendRefreshToken(res, createRefreshToken(userForRefreshToken));
 
       return { token, user };
     },
