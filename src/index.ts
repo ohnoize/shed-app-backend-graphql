@@ -57,6 +57,7 @@ server.applyMiddleware({ app });
 app.get('/', (_req, res) => res.send('Yello!'));
 
 app.post('/refresh_token', async (req, res) => {
+  console.log(req.cookies);
   const token = req.cookies.saID;
   if (!token) {
     return res.send({ success: false, token: '' });
