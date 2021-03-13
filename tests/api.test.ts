@@ -152,8 +152,6 @@ describe('Adding subjects, users, and sessions, able to create user and login, r
       variables: { username: 'testUser2', password: 'secret' },
     });
 
-    console.log(loginRes);
-
     const usersRes = await query({
       query: ALL_USERS,
     });

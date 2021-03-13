@@ -45,7 +45,12 @@ const server = new ApolloServer({
 });
 
 const app = express();
-app.use(cors());
+
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true,
+}));
+
 app.use(cookieParser());
 server.applyMiddleware({ app });
 
