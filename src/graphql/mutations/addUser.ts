@@ -15,6 +15,7 @@ import {
   DeleteGoalType,
 } from '../../types';
 import { createNewToken, createRefreshToken } from '../../auth';
+import { sendRefreshToken } from '../../sendRefreshToken';
 
 const typeDefs = gql`
   input subjectNotesInput {
@@ -83,9 +84,7 @@ const resolvers: Resolvers = {
       };
       const token = createNewToken(userForToken);
 
-      res.cookie('saID', createRefreshToken(userForRefreshToken), {
-        httpOnly: true,
-      });
+      sendRefreshToken(res, createRefreshToken(userForRefreshToken));
 
       return { token, user };
     },

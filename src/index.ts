@@ -7,9 +7,10 @@ import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import createSchema from './graphql/schema';
 import User, { UserBaseDocument } from './models/user';
-import { createNewToken } from './auth';
+import { createNewToken, createRefreshToken } from './auth';
 import config from './utils/config';
 import { TokenUserType } from './types';
+import { sendRefreshToken } from './sendRefreshToken';
 
 console.log('Connectingg to', config.MONGODB_URI);
 
@@ -60,7 +61,6 @@ app.post('/refresh_token', async (req, res) => {
   try {
     decodedRefreshToken = jwt.verify(token, config.REFRESH_SECRET_KEY);
   } catch (e) {
-    console.log(e);
     return res.send({ success: false, token: '' });
   }
   const user = await User.findOne({ _id: decodedRefreshToken.id });
@@ -72,6 +72,17 @@ app.post('/refresh_token', async (req, res) => {
     username: user.username,
     id: user.id,
   };
+
+  const userForRefreshToken = {
+    id: user.id,
+  };
+
+  res.cookie('saID', createRefreshToken(userForRefreshToken), {
+    httpOnly: true,
+  });
+
+  sendRefreshToken(res, createRefreshToken(userForRefreshToken));
+
   return res.send({ success: true, token: createNewToken(userForToken) });
 });
 
