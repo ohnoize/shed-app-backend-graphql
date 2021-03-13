@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const apollo_server_1 = require("apollo-server");
+const apollo_server_express_1 = require("apollo-server-express");
 const apollo_server_testing_1 = require("apollo-server-testing");
 const mongoose_1 = __importDefault(require("mongoose"));
 const index_1 = require("../src/index");
@@ -20,18 +20,18 @@ const session_1 = __importDefault(require("../src/models/session"));
 const subject_1 = __importDefault(require("../src/models/subject"));
 const user_1 = __importDefault(require("../src/models/user"));
 const utils_1 = require("./utils");
-const testServer = new apollo_server_1.ApolloServer({
+const testServer = new apollo_server_express_1.ApolloServer({
     schema: index_1.schema,
     introspection: true,
     playground: true,
-    context: () => {
+    context: ({ req, res }) => {
         const currentUser = new user_1.default({
             username: 'contextUser',
             passwordHash: 'contextHash',
             instrument: 'context',
             joined: new Date().toString(),
         });
-        return { currentUser };
+        return { currentUser, req, res };
     },
 });
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

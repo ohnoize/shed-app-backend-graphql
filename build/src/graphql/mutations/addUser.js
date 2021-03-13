@@ -17,6 +17,7 @@ const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../../models/user"));
 const subject_1 = __importDefault(require("../../models/subject"));
 const auth_1 = require("../../auth");
+const sendRefreshToken_1 = require("../../sendRefreshToken");
 const typeDefs = apollo_server_1.gql `
   input subjectNotesInput {
     subjectID: String
@@ -60,7 +61,7 @@ const resolvers = {
             }
             return user;
         }),
-        login: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+        login: (_root, args, { res }) => __awaiter(void 0, void 0, void 0, function* () {
             const user = yield user_1.default.findOne({ username: args.username });
             const passwordCorrect = user === null
                 ? false
@@ -72,7 +73,11 @@ const resolvers = {
                 username: user.username,
                 id: user.id,
             };
+            const userForRefreshToken = {
+                id: user.id,
+            };
             const token = auth_1.createNewToken(userForToken);
+            sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(userForRefreshToken));
             return { token, user };
         }),
         editUser: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {

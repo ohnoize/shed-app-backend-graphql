@@ -24,6 +24,7 @@ const schema_1 = __importDefault(require("./graphql/schema"));
 const user_1 = __importDefault(require("./models/user"));
 const auth_1 = require("./auth");
 const config_1 = __importDefault(require("./utils/config"));
+const sendRefreshToken_1 = require("./sendRefreshToken");
 console.log('Connectingg to', config_1.default.MONGODB_URI);
 mongoose_1.default.connect(config_1.default.MONGODB_URI, {
     useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false, useCreateIndex: true,
@@ -63,10 +64,9 @@ app.post('/refresh_token', (req, res) => __awaiter(void 0, void 0, void 0, funct
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     let decodedRefreshToken = null;
     try {
-        decodedRefreshToken = jsonwebtoken_1.default.verify(token, config_1.default.SECRET_KEY);
+        decodedRefreshToken = jsonwebtoken_1.default.verify(token, config_1.default.REFRESH_SECRET_KEY);
     }
     catch (e) {
-        console.log(e);
         return res.send({ success: false, token: '' });
     }
     const user = yield user_1.default.findOne({ _id: decodedRefreshToken.id });
@@ -77,6 +77,13 @@ app.post('/refresh_token', (req, res) => __awaiter(void 0, void 0, void 0, funct
         username: user.username,
         id: user.id,
     };
+    const userForRefreshToken = {
+        id: user.id,
+    };
+    res.cookie('saID', auth_1.createRefreshToken(userForRefreshToken), {
+        httpOnly: true,
+    });
+    sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(userForRefreshToken));
     return res.send({ success: true, token: auth_1.createNewToken(userForToken) });
 }));
 app.listen({ port: process.env.PORT || config_1.default.PORT }, () => {
