@@ -1,9 +1,7 @@
 import { AuthenticationError, gql, UserInputError } from 'apollo-server';
-import jwt from 'jsonwebtoken';
 import bcrypt from 'bcrypt';
 import User, { UserBaseDocument } from '../../models/user';
 import Subject from '../../models/subject';
-import config from '../../utils/config';
 // eslint-disable-next-line import/no-cycle
 import { Context, ResolverMap } from '../schema';
 import {
@@ -16,6 +14,7 @@ import {
   AddGoalType,
   DeleteGoalType,
 } from '../../types';
+import { createNewToken, createRefreshToken } from '../../auth';
 
 const typeDefs = gql`
   input subjectNotesInput {
@@ -64,7 +63,7 @@ const resolvers: Resolvers = {
       }
       return user;
     },
-    login: async (_root: DBUserType, args: LoginType): Promise<LoginResponse> => {
+    login: async (_root: DBUserType, args: LoginType, { res }: Context): Promise<LoginResponse> => {
       const user = await User.findOne({ username: args.username });
 
       const passwordCorrect = user === null
@@ -78,7 +77,15 @@ const resolvers: Resolvers = {
         username: user.username,
         id: user.id,
       };
-      const token = jwt.sign(userForToken, config.SECRET_KEY, { expiresIn: '24h' });
+
+      const userForRefreshToken = {
+        id: user.id,
+      };
+      const token = createNewToken(userForToken);
+
+      res.cookie('saID', createRefreshToken(userForRefreshToken), {
+        httpOnly: true,
+      });
 
       return { token, user };
     },

@@ -2,11 +2,12 @@
 import { ApolloServer } from 'apollo-server-express';
 import express from 'express';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
 import createSchema from './graphql/schema';
 import User, { UserBaseDocument } from './models/user';
-
+import { createNewToken } from './auth';
 import config from './utils/config';
 import { TokenUserType } from './types';
 
@@ -24,11 +25,11 @@ mongoose.connect(config.MONGODB_URI, {
 
 export const schema = createSchema();
 
-export const server = new ApolloServer({
+const server = new ApolloServer({
   schema,
   introspection: true,
   playground: true,
-  context: async ({ req }) => {
+  context: async ({ req, res }) => {
     const auth = req ? req.headers.authorization : null;
     if (auth && auth.toLowerCase().startsWith('bearer ')) {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,15 +37,43 @@ export const server = new ApolloServer({
         auth.substring(7), config.SECRET_KEY,
       );
       const currentUser: UserBaseDocument = await User.findOne({ _id: decodedToken.id });
-      return { currentUser };
+      return { currentUser, res, req };
     }
-    return {};
+    return { res, req };
   },
 });
 
 const app = express();
 app.use(cors());
+app.use(cookieParser());
 server.applyMiddleware({ app });
+
+app.get('/', (_req, res) => res.send('Yello!'));
+
+app.post('/refresh_token', async (req, res) => {
+  const token = req.cookies.saID;
+  if (!token) {
+    return res.send({ success: false, token: '' });
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let decodedRefreshToken: any = null;
+  try {
+    decodedRefreshToken = jwt.verify(token, config.REFRESH_SECRET_KEY);
+  } catch (e) {
+    console.log(e);
+    return res.send({ success: false, token: '' });
+  }
+  const user = await User.findOne({ _id: decodedRefreshToken.id });
+
+  if (!user) {
+    return res.send({ success: false, token: '' });
+  }
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+  return res.send({ success: true, token: createNewToken(userForToken) });
+});
 
 app.listen({ port: process.env.PORT || config.PORT }, () => {
   // eslint-disable-next-line no-console

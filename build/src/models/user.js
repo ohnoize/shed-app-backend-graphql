@@ -53,6 +53,10 @@ const userSchema = new mongoose_1.default.Schema({
                 type: String,
                 required: true,
             },
+            elapsedTime: {
+                type: Number,
+                required: true,
+            },
             targetTime: {
                 type: Number,
                 required: true,

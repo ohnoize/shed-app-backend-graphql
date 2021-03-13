@@ -49,18 +49,17 @@ const resolvers = {
             const user = yield user_1.default.findOne({ _id: args.userID });
             const session = new session_1.default(Object.assign(Object.assign({}, args), { user: user.id }));
             session.date = new Date().toString();
+            user.sessions = user.sessions.concat(session.id);
+            user.timePracticed += session.totalLength;
             try {
                 yield session.save();
-                user.sessions = user.sessions.concat(session.id);
-                user.timePracticed += session.totalLength;
-                yield user.save();
             }
             catch (error) {
                 throw new apollo_server_1.UserInputError(error.message, {
                     invalidArgs: args,
                 });
             }
-            session.individualSubjects.forEach((i) => __awaiter(void 0, void 0, void 0, function* () {
+            yield Promise.all(session.individualSubjects.map((i) => __awaiter(void 0, void 0, void 0, function* () {
                 const dbSubject = yield subject_1.default.findOne({ name: i.name });
                 dbSubject.timePracticed += i.length;
                 try {
@@ -71,11 +70,14 @@ const resolvers = {
                         invalidArgs: args,
                     });
                 }
+                const goal = user.goals.find((g) => g.subject === i.name);
+                if (goal) {
+                    goal.elapsedTime += i.length;
+                }
                 const subject = user.mySubjects.find((s) => s.subjectName === i.name);
                 if (subject) {
                     subject.timePracticed += i.length;
                     user.mySubjects.map((s) => (s.subjectName !== subject.subjectName ? s : subject));
-                    yield user.save();
                 }
                 else {
                     const newSubject = {
@@ -88,9 +90,8 @@ const resolvers = {
                         ...user.mySubjects,
                         newSubject,
                     ];
-                    yield user.save();
                 }
-            }));
+            })));
             try {
                 yield user.save();
             }

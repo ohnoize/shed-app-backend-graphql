@@ -1,6 +1,7 @@
 /* eslint-disable import/no-cycle */
 import { makeExecutableSchema, gql } from 'apollo-server';
 import { GraphQLSchema } from 'graphql';
+import { Request, Response } from 'express';
 import pkg from 'lodash';
 import Session from './types/Session';
 import Subject from './types/Subject';
@@ -18,6 +19,8 @@ export interface Context {
     session: typeof Session;
   };
   currentUser: typeof User
+  req: Request
+  res: Response
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -12,13 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.server = exports.schema = void 0;
+exports.schema = void 0;
 /* eslint-disable no-console */
-const apollo_server_1 = require("apollo-server");
+const apollo_server_express_1 = require("apollo-server-express");
+const express_1 = __importDefault(require("express"));
+const cors_1 = __importDefault(require("cors"));
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const schema_1 = __importDefault(require("./graphql/schema"));
 const user_1 = __importDefault(require("./models/user"));
+const auth_1 = require("./auth");
 const config_1 = __importDefault(require("./utils/config"));
 console.log('Connectingg to', config_1.default.MONGODB_URI);
 mongoose_1.default.connect(config_1.default.MONGODB_URI, {
@@ -31,22 +35,51 @@ mongoose_1.default.connect(config_1.default.MONGODB_URI, {
     console.log('Error connecting to MongoDB:', error.message);
 });
 exports.schema = schema_1.default();
-exports.server = new apollo_server_1.ApolloServer({
+const server = new apollo_server_express_1.ApolloServer({
     schema: exports.schema,
     introspection: true,
     playground: true,
-    context: ({ req }) => __awaiter(void 0, void 0, void 0, function* () {
+    context: ({ req, res }) => __awaiter(void 0, void 0, void 0, function* () {
         const auth = req ? req.headers.authorization : null;
         if (auth && auth.toLowerCase().startsWith('bearer ')) {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const decodedToken = jsonwebtoken_1.default.verify(auth.substring(7), config_1.default.SECRET_KEY);
             const currentUser = yield user_1.default.findOne({ _id: decodedToken.id });
-            return { currentUser };
+            return { currentUser, res, req };
         }
-        return {};
+        return { res, req };
     }),
 });
-exports.server.listen({ port: process.env.PORT || config_1.default.PORT }).then(({ url }) => {
+const app = express_1.default();
+app.use(cors_1.default());
+app.use(cookie_parser_1.default());
+server.applyMiddleware({ app });
+app.get('/', (_req, res) => res.send('Yello!'));
+app.post('/refresh_token', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const token = req.cookies.saID;
+    if (!token) {
+        return res.send({ success: false, token: '' });
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    let decodedRefreshToken = null;
+    try {
+        decodedRefreshToken = jsonwebtoken_1.default.verify(token, config_1.default.SECRET_KEY);
+    }
+    catch (e) {
+        console.log(e);
+        return res.send({ success: false, token: '' });
+    }
+    const user = yield user_1.default.findOne({ _id: decodedRefreshToken.id });
+    if (!user) {
+        return res.send({ success: false, token: '' });
+    }
+    const userForToken = {
+        username: user.username,
+        id: user.id,
+    };
+    return res.send({ success: true, token: auth_1.createNewToken(userForToken) });
+}));
+app.listen({ port: process.env.PORT || config_1.default.PORT }, () => {
     // eslint-disable-next-line no-console
-    console.log(`Server ready at ${url}`);
+    console.log(`Server ready at ${server.graphqlPath}`);
 });

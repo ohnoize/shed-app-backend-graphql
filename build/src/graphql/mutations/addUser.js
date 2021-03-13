@@ -13,11 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const apollo_server_1 = require("apollo-server");
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const user_1 = __importDefault(require("../../models/user"));
 const subject_1 = __importDefault(require("../../models/subject"));
-const config_1 = __importDefault(require("../../utils/config"));
+const auth_1 = require("../../auth");
 const typeDefs = apollo_server_1.gql `
   input subjectNotesInput {
     subjectID: String
@@ -34,6 +33,7 @@ const typeDefs = apollo_server_1.gql `
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
     addGoal(id: String!, goal: goalInput!): User
+    deleteGoal(userID: String!, goalID: String!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
   }
@@ -72,7 +72,7 @@ const resolvers = {
                 username: user.username,
                 id: user.id,
             };
-            const token = jsonwebtoken_1.default.sign(userForToken, config_1.default.SECRET_KEY, { expiresIn: '24h' });
+            const token = auth_1.createNewToken(userForToken);
             return { token, user };
         }),
         editUser: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
@@ -122,7 +122,7 @@ const resolvers = {
             const user = yield user_1.default.findOne({ _id: args.id });
             if (!user)
                 return null;
-            const newGoal = Object.assign(Object.assign({}, args.goal), { passed: false });
+            const newGoal = Object.assign(Object.assign({}, args.goal), { elapsedTime: 0, passed: false });
             user.goals = [
                 ...user.goals,
                 newGoal,
@@ -132,6 +132,24 @@ const resolvers = {
             }
             catch (error) {
                 throw new apollo_server_1.UserInputError(error.message, {
+                    invalidArgs: args,
+                });
+            }
+            return user;
+        }),
+        deleteGoal: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield user_1.default.findOne({ _id: args.userID });
+            if (!user)
+                return null;
+            const goalToDelete = user.goals.find((g) => g.id === args.goalID);
+            if (!goalToDelete)
+                return null;
+            user.goals = user.goals.filter((g) => g.id !== args.goalID);
+            try {
+                yield user.save();
+            }
+            catch (e) {
+                throw new apollo_server_1.UserInputError(e.message, {
                     invalidArgs: args,
                 });
             }
