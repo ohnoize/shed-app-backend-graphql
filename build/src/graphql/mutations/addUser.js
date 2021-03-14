@@ -34,9 +34,11 @@ const typeDefs = apollo_server_1.gql `
     login(username: String!, password: String!): AuthPayload
     editUser(id: String!, subjectNotes: subjectNotesInput!): User
     addGoal(id: String!, goal: goalInput!): User
+    editGoal(userID: String!, goalID: String!, time: Int!): Goal
     deleteGoal(userID: String!, goalID: String!): User
     deleteUser(id: String!): User
     deleteUserByName(username: String!): User
+    logOut: Boolean!
   }
 `;
 const resolvers = {
@@ -73,11 +75,13 @@ const resolvers = {
                 username: user.username,
                 id: user.id,
             };
-            const userForRefreshToken = {
-                id: user.id,
-            };
+            if (!(process.env.NODE_ENV === 'test')) {
+                const userForRefreshToken = {
+                    id: user.id,
+                };
+                sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(userForRefreshToken));
+            }
             const token = auth_1.createNewToken(userForToken);
-            sendRefreshToken_1.sendRefreshToken(res, auth_1.createRefreshToken(userForRefreshToken));
             return { token, user };
         }),
         editUser: (_root, args, context) => __awaiter(void 0, void 0, void 0, function* () {
@@ -142,6 +146,28 @@ const resolvers = {
             }
             return user;
         }),
+        editGoal: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
+            const user = yield user_1.default.findOne({ _id: args.userID });
+            if (!user)
+                return null;
+            const goalToEdit = user.goals.find((g) => g.id === args.goalID);
+            if (!goalToEdit)
+                return null;
+            goalToEdit.elapsedTime += args.time;
+            if (goalToEdit.elapsedTime >= goalToEdit.targetTime) {
+                goalToEdit.passed = true;
+            }
+            user.goals = user.goals.map((g) => (g.id !== args.goalID ? g : goalToEdit));
+            try {
+                yield user.save();
+            }
+            catch (e) {
+                throw new apollo_server_1.UserInputError(e.message, {
+                    invalidArgs: args,
+                });
+            }
+            return goalToEdit;
+        }),
         deleteGoal: (_root, args) => __awaiter(void 0, void 0, void 0, function* () {
             const user = yield user_1.default.findOne({ _id: args.userID });
             if (!user)
@@ -162,6 +188,10 @@ const resolvers = {
         }),
         deleteUser: (_root, args) => __awaiter(void 0, void 0, void 0, function* () { return user_1.default.findByIdAndDelete(args.id); }),
         deleteUserByName: (_root, args) => __awaiter(void 0, void 0, void 0, function* () { return user_1.default.findOneAndDelete({ username: args.username }); }),
+        logOut: (_root, _args, { res }) => __awaiter(void 0, void 0, void 0, function* () {
+            sendRefreshToken_1.sendRefreshToken(res, '');
+            return true;
+        }),
     },
 };
 exports.default = {
