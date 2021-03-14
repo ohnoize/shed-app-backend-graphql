@@ -18,7 +18,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: 'https://main.d3k7j0mq4yzbfz.amplifyapp.com/',
     credentials: true,
   }),
 );
