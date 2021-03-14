@@ -16,12 +16,7 @@ console.log('Connectingg to', config.MONGODB_URI);
 
 const app = express();
 
-app.use(
-  cors({
-    origin: 'https://main.d3k7j0mq4yzbfz.amplifyapp.com/',
-    credentials: true,
-  }),
-);
+app.use(cors());
 
 app.use(cookieParser());
 
@@ -89,7 +84,7 @@ const server = new ApolloServer({
   },
 });
 
-server.applyMiddleware({ app, cors: false });
+server.applyMiddleware({ app });
 
 app.listen({ port: process.env.PORT || config.PORT }, () => {
   // eslint-disable-next-line no-console
