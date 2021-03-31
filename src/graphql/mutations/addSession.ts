@@ -43,7 +43,7 @@ const resolvers: Resolvers = {
       }
       const user = await User.findOne({ _id: args.userID });
       const session = new Session({ ...args, user: user.id });
-      session.date = new Date().toString();
+      session.date = new Date().toISOString();
       user.sessions = user.sessions.concat(session.id);
       user.timePracticed += session.totalLength;
       try {
