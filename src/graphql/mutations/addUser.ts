@@ -55,7 +55,7 @@ const resolvers: Resolvers = {
       const user = new User({
         username: args.username,
         instrument: args.instrument,
-        joined: new Date().toString(),
+        joined: new Date().toISOString(),
         timePracticed: 0,
         passwordHash,
       });
